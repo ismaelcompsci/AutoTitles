@@ -1,0 +1,206 @@
+import { Modal } from '@/components/ui/modal'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import {
+  currentTaskAtom,
+  downloadedModelsAtom,
+  showDownloadModalDialogAtom,
+  whisperUserConfigurationAtom
+} from '@/state/whisper-model-state'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { Button } from './ui/button'
+import { useEffect, useState } from 'react'
+import type { FfprobeData } from 'fluent-ffmpeg'
+import { FileVolume } from 'lucide-react'
+import { WhisperModel } from '@/util/models'
+import NumberInput from './number-input'
+import { stepAtom } from '@/state/main-state'
+import { toast } from 'sonner'
+import { v4 as uuidv4 } from 'uuid'
+import path from 'path'
+import { WhisperTask } from '@/hooks/use-transcription'
+import { WhisperTaskMedia } from '@/hooks/use-transcription'
+
+interface Props {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  file: File | null
+}
+
+export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
+  const setShowDownloadModalDialog = useSetAtom(showDownloadModalDialogAtom)
+  const downloadedModels = useAtomValue(downloadedModelsAtom)
+  const setCurrentTask = useSetAtom(currentTaskAtom)
+  const [probeData, setProbeDate] = useState<FfprobeData | undefined>(undefined)
+  const setStep = useSetAtom(stepAtom)
+
+  const [config, setConfig] = useAtom(whisperUserConfigurationAtom)
+
+  useEffect(() => {
+    const a = async () => {
+      if (!file?.path) {
+        return
+      }
+
+      const probedata = await window.api.probe(file?.path)
+      setProbeDate(probedata)
+    }
+
+    a()
+  }, [file])
+
+  const handleStartTranscription = async () => {
+    if (!config.model) {
+      toast.error('Select a Model')
+      return
+    }
+
+    if (!file?.path) {
+      return
+    }
+
+    const modelPath = downloadedModels.find((model) => model.name === config.model)?.path
+
+    if (!modelPath) {
+      return
+    }
+
+    const taskId = uuidv4()
+    const downloadsFolder = await window.api.getDownloadsFolder()
+
+    const media: WhisperTaskMedia = {
+      original_input_path: file.path,
+      folder: path.join(downloadsFolder, taskId)
+    }
+
+    const task: WhisperTask = {
+      model: modelPath,
+      maxWordsPerSegment: config.maxWordsPerSegment,
+      lang: config.lang,
+      media: media,
+      id: taskId,
+      step: 'IDLE'
+    }
+
+    setCurrentTask(task)
+    setStep('PROCESS')
+  }
+
+  const formatSecondsToTimeStamp = (seconds: number) => {
+    seconds = Math.floor(seconds) // Remove decimals
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const remainingSeconds = seconds % 60
+
+    const formattedHours = hours.toString().padStart(2, '0')
+    const formattedMinutes = minutes.toString().padStart(2, '0')
+    const formattedSeconds = remainingSeconds.toString().padStart(2, '0')
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+  }
+
+  const videoTime = probeData?.format.duration
+    ? formatSecondsToTimeStamp(probeData?.format.duration)
+    : ''
+
+  const handleSelectModelChange = (value: WhisperModel) => {
+    setConfig((p) => ({ ...p, model: value }))
+  }
+
+  const handleMaxCharPerSegmentInputChange = (value: number) => {
+    setConfig((p) => ({ ...p, maxWordsPerSegment: value }))
+  }
+
+  return (
+    <Modal.Modal open={open} onOpenChange={onOpenChange}>
+      <Modal.Content>
+        <Modal.Body>
+          <Modal.Header>
+            <Modal.Title>Whisper Configuration</Modal.Title>
+          </Modal.Header>
+
+          {/* <div> */}
+          <div className="border rounded-md">
+            <div className="px-4">
+              {/* model */}
+              <div className="h-12 flex items-center gap-1 border-b">
+                <p className="grow">Model</p>
+
+                <Select
+                  disabled={downloadedModels.length === 0}
+                  value={config?.model}
+                  onValueChange={handleSelectModelChange}
+                >
+                  <SelectTrigger className="w-fit border-none gap-1 min-w-[140px]">
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground">
+                        Downloaded Models
+                      </SelectLabel>
+                      <SelectSeparator />
+                      {downloadedModels.map((model) => {
+                        return (
+                          <SelectItem key={`${model.name}`} value={model.name}>
+                            {model.name}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  size={'tiny'}
+                  variant={'secondary'}
+                  onClick={() => setShowDownloadModalDialog(true)}
+                >
+                  Download models...
+                </Button>
+              </div>
+
+              {/* max chars */}
+
+              <div className="h-12 flex items-center gap-1">
+                <p className="grow">Max. Characters per Segments</p>
+                <NumberInput
+                  value={Number(config.maxWordsPerSegment)}
+                  onChange={handleMaxCharPerSegmentInputChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="border rounded-md">
+            <div className="px-4">
+              <div className="h-12 flex items-center text-sm text-muted-foreground">
+                <span className="flex flex-row grow gap-4 items-center">
+                  <FileVolume className="h-4 w-4" />
+                  {file?.name}
+                </span>
+
+                <div className="">{videoTime}</div>
+              </div>
+            </div>
+          </div>
+          {/* </div> */}
+        </Modal.Body>
+        <Modal.Actions>
+          <Modal.Cancel>Cancel</Modal.Cancel>
+          <Modal.Action onClick={() => handleStartTranscription()} disabled={!config?.model}>
+            Continue
+          </Modal.Action>
+        </Modal.Actions>
+      </Modal.Content>
+    </Modal.Modal>
+  )
+}
