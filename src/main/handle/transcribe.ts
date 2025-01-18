@@ -1,70 +1,29 @@
-import path from 'path'
-import { promisify } from 'util'
+import { decode } from 'node-wav'
+import fs from 'fs'
 import { WhisperParams } from '../shared/shared'
-console.log(__dirname)
-const { whisper } = require(path.join(__dirname, '../../whisper.cpp/build/Release/addon.node.node'))
-
-// Define the type for the whisper function
-
-const whisperAsync: (params: WhisperParams) => Promise<any> = promisify(whisper)
-
-const defaultWhisperParams = {
-  // use_gpu: true,
-  // flash_attn: false,
-  // no_prints: true,
-  // comma_in_time: false,
-  // translate: false,
-  // no_timestamps: false,
-  // audio_ctx: 0,
-  // split_on_word: false,
-  // max_len: 0
-  use_gpu: true,
-  flash_attn: false,
-  no_prints: false,
-  comma_in_time: true,
-  translate: true,
-  no_timestamps: false,
-  audio_ctx: 0,
-  split_on_word: true,
-  max_len: 24
-}
+import { Whisper } from 'smart-whisper'
 
 export async function transcribe(
   _event: Electron.IpcMainInvokeEvent,
   params: WhisperParams
-): Promise<void> {
-  const wparams: WhisperParams = {
-    use_gpu: defaultWhisperParams.use_gpu,
-    flash_attn: defaultWhisperParams.flash_attn,
-    no_prints: defaultWhisperParams.no_prints,
-    comma_in_time: defaultWhisperParams.comma_in_time,
-    no_timestamps: defaultWhisperParams.no_prints,
-    audio_ctx: defaultWhisperParams.audio_ctx,
-    translate: defaultWhisperParams.translate,
+): Promise<{ from: number; to: number; text: string }[]> {
+  const whisper = new Whisper(params.model, { gpu: true })
+  const pcm = read_wav(params.fname_inp)
 
-    split_on_word: Boolean(defaultWhisperParams.split_on_word),
-    max_len: Number(defaultWhisperParams.max_len),
+  const task = await whisper.transcribe(pcm, { language: 'en' })
 
-    language: params.language,
-    model: params.model,
-    fname_inp: params.fname_inp
+  return await task.result
+}
+
+function read_wav(file: string): Float32Array {
+  const { sampleRate, channelData } = decode(fs.readFileSync(file))
+
+  if (sampleRate !== 16000) {
+    throw new Error(`Invalid sample rate: ${sampleRate}`)
+  }
+  if (channelData.length !== 1) {
+    throw new Error(`Invalid channel count: ${channelData.length}`)
   }
 
-  for (const [key, value] of Object.entries(wparams)) {
-    console.log(key, typeof value)
-  }
-
-  const output = await whisperAsync({
-    use_gpu: true,
-    flash_attn: false,
-    no_prints: true,
-    comma_in_time: false,
-    translate: true,
-    no_timestamps: false,
-    audio_ctx: 0,
-    language: params.language,
-    model: params.model,
-    fname_inp: params.fname_inp
-  })
-  return output
+  return channelData[0]
 }
