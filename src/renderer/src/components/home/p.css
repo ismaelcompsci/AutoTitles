@@ -1,7 +1,8 @@
 /* Styling the region handle */
 #waveform ::part(region) {
-  background: hsl(0 ,0% ,0%,0.6);
-  z-index: 50;
+  /* background: hsl(0 ,0% ,0%,0.6); */
+  /* z-index: 50;  */
+  background: transparent;
   
   border-radius: 6px;
   border: 1px solid hsla(0, 0%, 100%, 0.14);
@@ -10,7 +11,7 @@
 
 #waveform ::part(region active) {
   background: hsla(169 ,78%, 7%, 0.5);
-  border: 1px solid hsla(173 80% 36%);
+  /* border: 1px solid hsla(173 80% 36%); */
   color: hsl(0 0% 93%);;
 }
 
@@ -19,6 +20,9 @@
   margin-top: 0px;
   font-size: 0.8rem;
   background: #0a0a0a;
+  /* width: 98%; */
+  overflow: hidden;
+
 
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;

@@ -27,8 +27,7 @@ export const WhisperDownloadModelsDialog = () => {
     window.api.onDownloadProgress(({ bytesReceived }) => {
       setDownload((p) => ({ ...p, loading: true, bytesReceived: bytesReceived }))
     })
-    window.api.onDownloadCompleted(({ id, filePath, model }) => {
-      console.log('SETTINGS', id, model, download.id)
+    window.api.onDownloadCompleted(({ filePath, model }) => {
       setDownloadedModels((p) => {
         const exists = p.find((m) => m.name === model && m.path === filePath)
 

@@ -27,7 +27,7 @@ module.exports = {
           background: {
             "100": "hsl(var(--ds-background-100))",
             "200": "hsl(var(--ds-background-200))",
-            DEFAULT: "hsl(var(--background))",
+            DEFAULT: "hsl(var(--ds-background-100))",
           },
           foreground: "hsl(var(--foreground))",
           card: {

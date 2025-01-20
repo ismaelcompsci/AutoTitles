@@ -1,7 +1,6 @@
-import { AudioLines, Upload } from 'lucide-react'
+import { AudioLines, Paperclip, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from '../ui/button'
-import { Stack } from '../ui/stack'
 import { WhisperInputDialog } from '../whisper-input-dialog'
 import { WhisperDownloadModelsDialog } from '../whisper-download-models-dialog'
 
@@ -33,14 +32,13 @@ export const FileInput = () => {
 
     setIsModalOpen(open)
   }
-
   return (
-    <Stack direction={'column'} justify="center" className="text-foreground">
+    <div className="flex flex-col justify-center text-foreground h-full">
       {!file && (
-        <Stack justify="center" align="center">
+        <div className="flex flex-col justify-center items-center">
           <AudioLines className="h-28 w-28 text-muted-foreground" />
 
-          <Stack gap={2}>
+          <div className="flex gap-2 items-center flex-col">
             <div>
               {supportedFormats.map((format) => (
                 <span
@@ -52,7 +50,7 @@ export const FileInput = () => {
               ))}
             </div>
             - or -
-            <Button onClick={handleClick} size={'sm'} prefix={<Upload className="h-4 w-4" />}>
+            <Button onClick={handleClick} size={'sm'} prefix={<Paperclip className="h-4 w-4" />}>
               Upload
               <input
                 id="file-upload"
@@ -63,13 +61,13 @@ export const FileInput = () => {
                 ref={fileInputRef}
               />
             </Button>
-          </Stack>
-        </Stack>
+          </div>
+        </div>
       )}
 
       <WhisperInputDialog file={file} open={isModalOpen} onOpenChange={handleModalOpenChange} />
 
       <WhisperDownloadModelsDialog />
-    </Stack>
+    </div>
   )
 }

@@ -19,7 +19,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { Button } from './ui/button'
 import { useEffect, useState } from 'react'
 import type { FfprobeData } from 'fluent-ffmpeg'
-import { FileVolume } from 'lucide-react'
+import { FileVolume, Loader2 } from 'lucide-react'
 import { WhisperModel } from '@/util/models'
 import NumberInput from './number-input'
 import { stepAtom } from '@/state/main-state'
@@ -69,7 +69,7 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
 
     const modelPath = downloadedModels.find((model) => model.name === config.model)?.path
 
-    if (!modelPath) {
+    if (!modelPath || !probeData) {
       return
     }
 
@@ -78,12 +78,13 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
 
     const media: WhisperTaskMedia = {
       original_input_path: file.path,
-      folder: path.join(downloadsFolder, taskId)
+      folder: path.join(downloadsFolder, taskId),
+      duration: (probeData.streams[0].duration ?? 0) as number
     }
 
     const task: WhisperTask = {
       model: modelPath,
-      maxWordsPerSegment: config.maxWordsPerSegment,
+      maxLen: config.maxLen,
       lang: config.lang,
       media: media,
       id: taskId,
@@ -109,14 +110,14 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
 
   const videoTime = probeData?.format.duration
     ? formatSecondsToTimeStamp(probeData?.format.duration)
-    : ''
+    : undefined
 
   const handleSelectModelChange = (value: WhisperModel) => {
     setConfig((p) => ({ ...p, model: value }))
   }
 
   const handleMaxCharPerSegmentInputChange = (value: number) => {
-    setConfig((p) => ({ ...p, maxWordsPerSegment: value }))
+    setConfig((p) => ({ ...p, maxLen: value }))
   }
 
   return (
@@ -171,9 +172,9 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
               {/* max chars */}
 
               <div className="h-12 flex items-center gap-1">
-                <p className="grow">Max. Characters per Segments</p>
+                <p className="grow">Limit Characters per Segments/Line</p>
                 <NumberInput
-                  value={Number(config.maxWordsPerSegment)}
+                  value={Number(config.maxLen)}
                   onChange={handleMaxCharPerSegmentInputChange}
                 />
               </div>
@@ -183,16 +184,20 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
           <div className="border rounded-md">
             <div className="px-4">
               <div className="h-12 flex items-center text-sm text-muted-foreground">
-                <span className="flex flex-row grow gap-4 items-center">
+                <div className="flex flex-row grow gap-4 items-center">
                   <FileVolume className="h-4 w-4" />
-                  {file?.name}
-                </span>
 
-                <div className="">{videoTime}</div>
+                  <span className="line-clamp-1 text-balance">{file?.name}</span>
+                </div>
+
+                {videoTime ? (
+                  <div className="">{videoTime}</div>
+                ) : (
+                  <Loader2 className="h-2 w-2 animate-spin" />
+                )}
               </div>
             </div>
           </div>
-          {/* </div> */}
         </Modal.Body>
         <Modal.Actions>
           <Modal.Cancel>Cancel</Modal.Cancel>

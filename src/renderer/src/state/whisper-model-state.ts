@@ -14,7 +14,7 @@ export const currentTaskAtom = atom<WhisperTask | null>(null)
 export type WhisperUserConfig = {
   model?: WhisperModel
   lang: string
-  maxWordsPerSegment: number
+  maxLen: number
 }
 
 export const whisperUserConfigurationAtom = atomWithStorage<WhisperUserConfig>(
@@ -22,6 +22,6 @@ export const whisperUserConfigurationAtom = atomWithStorage<WhisperUserConfig>(
   {
     model: undefined,
     lang: 'en',
-    maxWordsPerSegment: 3
+    maxLen: 60
   }
 )

@@ -21,7 +21,11 @@ export default function NumberInput({
           >
             <Minus size={16} strokeWidth={2} aria-hidden="true" />
           </Button>
-          <Input className="bg-background-100 max-w-14 px-3 py-2 text-center tabular-nums text-foreground focus:outline-none" />
+          <Input
+            value={value === 0 ? 'Auto' : value}
+            disabled
+            className="bg-background-100 max-w-14 px-3 py-2 text-center tabular-nums text-foreground focus:outline-none"
+          />
           <Button
             slot="increment"
             className="bg-background-100 -me-px flex aspect-square h-[inherit] items-center justify-center rounded-e-lg border border-input text-sm text-muted-foreground/80 transition-shadow hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"

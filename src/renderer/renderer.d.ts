@@ -1,4 +1,3 @@
-import type { WhisperParams } from 'src/main/shared/shared'
 import type {
   DownloadCompleted,
   DownloadProgress,
@@ -6,6 +5,7 @@ import type {
   DownloadWhisperModel
 } from '../main/handle/download-whisper-model'
 import type { FfprobeData } from 'fluent-ffmpeg'
+import { WhisperParams, WhisperResponse } from 'src/shared/shared'
 
 export interface IAPI {
   openFile: (options: Electron.OpenDialogOptions) => Promise<Electron.OpenDialogReturnValue>
@@ -13,7 +13,7 @@ export interface IAPI {
     args: DownloadWhisperModel
   ) => Promise<{ alreadyExisted: boolean; downloadId: string }>
   probe: (file: string) => Promise<FfprobeData>
-  transcribe: (whisper: WhisperParams) => Promise<string[][]>
+  transcribe: (whisper: WhisperParams) => Promise<WhisperResponse>
   encodeForWhisper: (file: string) => Promise<string>
   encodeAudioForBrowser: (args: { inputPath: string; outputPath: string }) => Promise<string>
   getDownloadsFolder: () => Promise<string>
