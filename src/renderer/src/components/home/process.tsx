@@ -1,10 +1,8 @@
 import { currentTaskAtom } from '@/state/whisper-model-state'
-import { useAtom } from 'jotai'
-import { Loader2 } from 'lucide-react'
+import { useAtomValue } from 'jotai'
 import './p.css'
 import { useEffect } from 'react'
 import { Step, useTranscription } from '@/hooks/use-transcription'
-import { MediaProvider } from '@/state/context'
 import { WhisperSubtitleDisplay } from '../display/subtitle-display'
 
 const stepToInfoMap: Record<Step, string> = {
@@ -15,9 +13,9 @@ const stepToInfoMap: Record<Step, string> = {
 }
 
 export const Process = () => {
-  const [task, setTask] = useAtom(currentTaskAtom)
+  const task = useAtomValue(currentTaskAtom)
 
-  const { generateTranscription, task: workingTask } = useTranscription()
+  const { generateTranscription } = useTranscription()
 
   useEffect(() => {
     ;(async () => {
@@ -29,22 +27,13 @@ export const Process = () => {
     })()
   }, [task])
 
-  useEffect(() => {
-    // DEV ONLY
-    if (workingTask?.step === 'DONE') {
-      setTask(workingTask)
-    }
-  }, [workingTask])
-
-  if (workingTask) {
-    return (
-      <div>
-        <MediaProvider task={workingTask}>
-          <WhisperSubtitleDisplay />
-        </MediaProvider>
-      </div>
-    )
+  if (!task) {
+    return <div className="h-full w-full animate-pulse"></div>
   }
 
-  return <div>PROCESS Done</div>
+  return (
+    <div>
+      <WhisperSubtitleDisplay />
+    </div>
+  )
 }

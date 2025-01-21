@@ -1,26 +1,26 @@
 /* Styling the region handle */
 #waveform ::part(region) {
   /* background: hsl(0 ,0% ,0%,0.6); */
-  /* z-index: 50;  */
   background: transparent;
   
   border-radius: 6px;
   border: 1px solid hsla(0, 0%, 100%, 0.14);
   color: hsl(0 0% 63%);
+  overflow: hidden;
 } 
 
 #waveform ::part(region active) {
-  background: hsla(169 ,78%, 7%, 0.5);
-  /* border: 1px solid hsla(173 80% 36%); */
+  background: oklch(64.92% 0.1403 181.95 / 0.2);
+  /* border: 1px solid hsla(173 80% 36%); */ 
   color: hsl(0 0% 93%);;
 }
 
 #waveform ::part(region-content) {
-  padding-inline: 8px;
+  /* padding-inline: 8px; */
   margin-top: 0px;
-  font-size: 0.8rem;
+  font-size: 16px;
   background: #0a0a0a;
-  /* width: 98%; */
+  width: 100%;
   overflow: hidden;
 
 

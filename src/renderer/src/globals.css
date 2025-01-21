@@ -7,6 +7,10 @@
   color: var(--geist-selection-text-color);
 }
 
+html, body {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
     --color-1: 0 100% 63%;

@@ -1,14 +1,15 @@
 import * as SliderPrimitive from '@radix-ui/react-slider'
 import { secondsToTimestamp } from '@/lib/utils'
-import { MediaShadowProviderContext } from '@/state/context'
 import { Pause, Play } from 'lucide-react'
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { useAtom, useAtomValue } from 'jotai'
 import { currentTimeAtom, playingAtom } from '@/state/media-display-state'
+import { durationAtom, wavesurferAtom } from '@/state/whisper-model-state'
 
 const TimeSlider = () => {
-  const { duration, wavesurfer } = useContext(MediaShadowProviderContext)
+  const duration = useAtomValue(durationAtom)
+  const wavesurfer = useAtomValue(wavesurferAtom)
   const [currentTime, setCurrentTime] = useAtom(currentTimeAtom)
 
   useEffect(() => {
@@ -40,7 +41,7 @@ const TimeSlider = () => {
 }
 
 const CurrentTimeDisplay = () => {
-  const { duration } = useContext(MediaShadowProviderContext)
+  const duration = useAtomValue(durationAtom)
   const currentTime = useAtomValue(currentTimeAtom)
 
   return (
@@ -53,11 +54,12 @@ const CurrentTimeDisplay = () => {
 
 const MediaPlayerPlayPauseButton = () => {
   const playing = useAtomValue(playingAtom)
-  const { wavesurfer } = useContext(MediaShadowProviderContext)
+  const wavesurfer = useAtomValue(wavesurferAtom)
 
   const playOrPause = () => {
     if (!wavesurfer) return
 
+    // CAHNGE
     wavesurfer.setVolume(0.3)
     wavesurfer.playPause()
   }
@@ -90,7 +92,7 @@ const MediaPlayerPlayPauseButton = () => {
 }
 export const MediaPlayerControls = () => {
   return (
-    <div className="border-t-[1px] px-4 py-1 flex flex-col w-full">
+    <div className="media-controls border-t-[1px] px-4 py-1 flex flex-col w-full">
       <div className="flex items-center gap-4">
         <CurrentTimeDisplay />
 

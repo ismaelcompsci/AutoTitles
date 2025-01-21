@@ -1,63 +1,88 @@
-import { MediaShadowProviderContext } from '@/state/context'
-import { useContext, useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { MediaPlayerControls } from './media-player-controls'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { activeRegionIdAtom } from '@/state/media-display-state'
+import { regionsAtom, waveformContainerRefAtom, wavesurferAtom } from '@/state/whisper-model-state'
+import { debounce } from 'lodash'
 
 export const DisplayBottom = () => {
+  const regions = useAtomValue(regionsAtom)
+  const setWaveformContainerRefAtom = useSetAtom(waveformContainerRefAtom)
   const setActiveRegionId = useSetAtom(activeRegionIdAtom)
-  const { setWaveformContainerRef, regions, duration } = useContext(MediaShadowProviderContext)
-
   const ref = useRef<HTMLDivElement | null>(null)
+  const wavesurfer = useAtomValue(wavesurferAtom)
+
+  const [size, setSize] = useState<{ width: number; height: number }>()
+
+  const calContainerSize = () => {
+    const size = ref?.current?.closest('.media-player-wrapper')?.getBoundingClientRect()
+    const controlsSize = ref?.current?.querySelector('.media-controls')?.getBoundingClientRect()
+
+    if (!size) return
+
+    setSize({ width: size.width, height: size.height })
+    if (wavesurfer) {
+      wavesurfer.setOptions({
+        height: size.height - (controlsSize?.height ?? 0)
+      })
+    }
+  }
+
+  const debouncedCalContainerSize = debounce(calContainerSize, 100)
 
   useEffect(() => {
     if (!ref?.current) return
-    setWaveformContainerRef(ref)
-  }, [ref])
+    setWaveformContainerRefAtom(ref)
+
+    if (!wavesurfer) return
+
+    let rafId: number
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        debouncedCalContainerSize()
+      })
+    })
+    observer.observe(ref.current)
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(rafId)
+    }
+  }, [ref, wavesurfer])
 
   useEffect(() => {
     if (!regions) return
-    if (duration === 0) return
 
-    const subscription = regions.on('region-clicked', (region) => {
-      regions
-        .getRegions()
-        .filter((r) => r.id.startsWith('active'))
-        .forEach((r) => {
-          // remove active regions
-          r.remove()
-          const newR = regions.addRegion({
-            ...r,
-            id: `id-${r.start}-${r.end}`
-          })
+    const subscriptions = [
+      regions.on('region-in', (ev) => {
+        ev.setOptions({ id: `active id-${ev.start}-${ev.end}` })
+        setActiveRegionId(`id-${ev.start}-${ev.end}`)
+      }),
 
-          newR._setTotalDuration(duration)
-          setActiveRegionId(null)
-        })
-
-      // active region
-      region.remove()
-      const newR = regions.addRegion({
-        ...region,
-        id: `active id-${region.start}-${region.end}`
+      regions.on('region-out', (ev) => {
+        ev.setOptions({ id: `id-${ev.start}-${ev.end}` })
       })
-
-      newR._setTotalDuration(duration)
-      setActiveRegionId(`id-${region.start}-${region.end}`)
-    })
+    ]
 
     return () => {
-      subscription()
+      subscriptions.forEach((sub) => sub())
     }
-  }, [regions, duration])
+  }, [regions])
 
   return (
-    <div className="w-full">
+    <div ref={ref} className="media-player-wrapper min-h-24 w-full bg-background-200 h-full">
       <MediaPlayerControls />
 
-      {/* wave  200px height */}
-      <div className="max-w-full overflow-x-scroll">
-        <div className="cont" id="waveform" ref={ref} />
+      <div className="media-player-wrapper max-w-full overflow-x-scroll">
+        <div
+          style={{
+            width: `${size?.width}px`,
+            height: `${size?.height}px`
+          }}
+          className="waveform-container"
+          id="waveform"
+        />
       </div>
     </div>
   )

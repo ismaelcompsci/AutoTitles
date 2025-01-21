@@ -1,10 +1,9 @@
-import { AudioLines, Paperclip, Upload } from 'lucide-react'
+import { AudioLines, Paperclip } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { WhisperInputDialog } from '../whisper-input-dialog'
 import { WhisperDownloadModelsDialog } from '../whisper-download-models-dialog'
-
-const supportedFormats = ['MP3', 'WAV', 'M4A', 'AAC', 'FLAC', 'OGG', 'OPUS', 'MP4', 'MOV', 'MKV']
+import { supportedFormats } from '@/lib/utils'
 
 export const FileInput = () => {
   const [file, setFile] = useState<File | null>(null)

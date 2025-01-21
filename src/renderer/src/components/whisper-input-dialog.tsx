@@ -28,6 +28,7 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import { WhisperTask } from '@/hooks/use-transcription'
 import { WhisperTaskMedia } from '@/hooks/use-transcription'
+import { getMediaType } from '@/lib/utils'
 
 interface Props {
   open: boolean
@@ -75,11 +76,18 @@ export const WhisperInputDialog = ({ open, onOpenChange, file }: Props) => {
 
     const taskId = uuidv4()
     const downloadsFolder = await window.api.getDownloadsFolder()
+    const type = getMediaType(file.type)
+
+    if (type === 'unsupported') {
+      toast.error('Unsupported file.')
+      return
+    }
 
     const media: WhisperTaskMedia = {
       original_input_path: file.path,
       folder: path.join(downloadsFolder, taskId),
-      duration: (probeData.streams[0].duration ?? 0) as number
+      duration: (probeData.streams[0].duration ?? 0) as number,
+      type: type
     }
 
     const task: WhisperTask = {
