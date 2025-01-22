@@ -1,11 +1,12 @@
-import * as SliderPrimitive from '@radix-ui/react-slider'
 import { secondsToTimestamp } from '@/lib/utils'
-import { Pause, Play } from 'lucide-react'
-import { useEffect } from 'react'
+import { MoreVertical, Pause, Play, Volume2, VolumeX } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { useAtom, useAtomValue } from 'jotai'
 import { currentTimeAtom, playingAtom } from '@/state/media-display-state'
 import { durationAtom, wavesurferAtom } from '@/state/whisper-model-state'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Slider } from '../common/slider'
 
 const TimeSlider = () => {
   const duration = useAtomValue(durationAtom)
@@ -27,16 +28,10 @@ const TimeSlider = () => {
   }, [wavesurfer])
 
   return (
-    <SliderPrimitive.Root
+    <Slider
       value={[(currentTime / duration) * 100]}
       onValueChange={([v]) => wavesurfer?.seekTo((duration * (v / 100)) / duration)}
-      className={'relative flex h-5 w-full touch-none select-none items-center'}
-    >
-      <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-secondary">
-        <SliderPrimitive.Range className="absolute h-full bg-primary" />
-      </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className="block h-3 w-2 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
-    </SliderPrimitive.Root>
+    />
   )
 }
 
@@ -45,9 +40,9 @@ const CurrentTimeDisplay = () => {
   const currentTime = useAtomValue(currentTimeAtom)
 
   return (
-    <span className="text-sm font-gesit-mono">
-      <span className="text-lg text-teal-700">{secondsToTimestamp(currentTime)}</span>
-      <span className="text-teal-500"> / {secondsToTimestamp(duration)}</span>
+    <span className="text-sm font-gesit-mono text-gray-900">
+      <span className="">{secondsToTimestamp(currentTime)}</span>
+      <span className=""> / {secondsToTimestamp(duration)}</span>
     </span>
   )
 }
@@ -59,8 +54,6 @@ const MediaPlayerPlayPauseButton = () => {
   const playOrPause = () => {
     if (!wavesurfer) return
 
-    // CAHNGE
-    wavesurfer.setVolume(0.3)
     wavesurfer.playPause()
   }
 
@@ -73,7 +66,7 @@ const MediaPlayerPlayPauseButton = () => {
         variant={'secondary'}
         shape="circle"
       >
-        <Pause className="h-5 w-5 fill-primary" />
+        <Pause className="h-4 w-4 fill-primary" />
       </Button>
     )
   }
@@ -86,19 +79,65 @@ const MediaPlayerPlayPauseButton = () => {
       variant={'secondary'}
       shape="circle"
     >
-      <Play className="h-5 w-5 fill-primary" />
+      <Play className="h-4 w-4 fill-primary" />
     </Button>
   )
 }
 export const MediaPlayerControls = () => {
   return (
-    <div className="media-controls border-t-[1px] px-4 py-1 flex flex-col w-full">
-      <div className="flex items-center gap-4">
-        <CurrentTimeDisplay />
+    <div className="media-controls border-t-[1px] p-4 flex flex-col w-full">
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <MediaPlayerPlayPauseButton />
+            <CurrentTimeDisplay />
+          </div>
 
-        <MediaPlayerPlayPauseButton />
+          <TimeSlider />
+
+          <div className="flex items-center gap-2">
+            <VolumeSlider />
+
+            <span className="text-sm font-medium text-zinc-400">{1.0}x</span>
+            <Button variant="tertiary" size="tiny" className="text-zinc-400">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
-      <TimeSlider />
     </div>
+  )
+}
+
+export const VolumeSlider = () => {
+  const [volume, setVolume] = useState(100)
+  const wavesurfer = useAtomValue(wavesurferAtom)
+
+  useEffect(() => {
+    if (!wavesurfer) return
+    wavesurfer.setVolume(volume / 100)
+  }, [volume])
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant={'tertiary'} size={'tiny'}>
+          <Volume2 className="h-4 w-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        side="top"
+        className="flex flex-col items-center gap-2 h-52 w-fit justify-center bg-background-100"
+      >
+        <Volume2 className="shrink-0 opacity-60 w-4 h-4 stroke-2" aria-hidden="true" />
+        <Slider
+          value={[volume]}
+          onValueChange={(v) => setVolume(v[0])}
+          className="w-1"
+          orientation="vertical"
+        />
+        <VolumeX className="shrink-0 opacity-60 w-4 h-4 stroke-2" aria-hidden="true" />
+      </PopoverContent>
+    </Popover>
   )
 }

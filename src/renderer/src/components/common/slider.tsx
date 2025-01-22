@@ -23,7 +23,7 @@ const Slider = React.forwardRef<
     <SliderPrimitive.Track
       className={cn(
         'relative grow overflow-hidden rounded-full bg-secondary',
-        "data-[orientation='horizontal']:h-2 data-[orientation='horizontal']:w-full",
+        "data-[orientation='horizontal']:h-1 data-[orientation='horizontal']:w-full",
         "data-[orientation='vertical']:h-full data-[orientation='vertical']:w-2"
       )}
     >
@@ -35,7 +35,13 @@ const Slider = React.forwardRef<
         )}
       />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+    <SliderPrimitive.Thumb
+      className={cn(
+        'block rounded-full border border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        "data-[orientation='horizontal']:h-2 data-[orientation='horizontal']:w-1",
+        "data-[orientation='vertical']:h-1 data-[orientation='vertical']:w-2"
+      )}
+    />
   </SliderPrimitive.Root>
 ))
 Slider.displayName = SliderPrimitive.Root.displayName

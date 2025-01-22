@@ -74,7 +74,7 @@ export const DisplayBottom = () => {
   }, [regions])
 
   return (
-    <div ref={ref} className="min-h-24 w-full bg-background-200 h-full">
+    <div ref={ref} className="min-h-24 w-full bg-background-100 h-full">
       <MediaPlayerControls />
 
       <div className="media-player-wrapper max-w-full overflow-x-scroll">

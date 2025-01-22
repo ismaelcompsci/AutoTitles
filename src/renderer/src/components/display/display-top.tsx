@@ -101,7 +101,7 @@ export const DisplayTopVideo = () => {
           onPause={() => setPlaying(false)}
           ref={handleRef}
           loop
-          className="aspect-video h-64 rounded-lg bg-background-200"
+          className="aspect-video h-64 rounded-lg bg-black"
           controls={false}
         >
           <source src={videoSrc} />

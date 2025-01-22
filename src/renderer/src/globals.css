@@ -7,13 +7,14 @@
   color: var(--geist-selection-text-color);
 }
 
-html, body {
+html,
+body {
   scroll-behavior: smooth;
   position: fixed;
 }
 
 body {
-  height:  100%;
+  height: 100%;
   width: 100%;
   overflow: hidden;
 }
@@ -23,21 +24,14 @@ body {
 }
 
 html {
-  height:  100%;
+  height: 100%;
   width: 100%;
 }
-
-.header {
-  -webkit-app-region: drag;
-  /* -webkit-user-select: none; */
-  /* cursor: default; */
-}
-
 
 @layer base {
   :root {
     font-size: 15px;
-    
+
     --color-1: 0 100% 63%;
     --color-2: 270 100% 63%;
     --color-3: 210 100% 63%;
@@ -197,28 +191,21 @@ html {
     --ds-shadow-border: 0 0 0 1px var(--ds-gray-alpha-400);
     --ds-shadow-border-inset: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
     --ds-shadow-small: 0px 2px 2px rgba(0, 0, 0, 0.04);
-    --ds-shadow-input-ring: 0 0 0 1px var(--ds-gray-alpha-600),
-      0 0 0 4px rgba(0, 0, 0, 0.16);
+    --ds-shadow-input-ring: 0 0 0 1px var(--ds-gray-alpha-600), 0 0 0 4px rgba(0, 0, 0, 0.16);
     --ds-shadow-border-small: var(--ds-shadow-border), var(--ds-shadow-small);
-    --ds-shadow-medium: 0px 2px 2px rgba(0, 0, 0, 0.04),
-      0px 8px 8px -8px rgba(0, 0, 0, 0.04);
+    --ds-shadow-medium: 0px 2px 2px rgba(0, 0, 0, 0.04), 0px 8px 8px -8px rgba(0, 0, 0, 0.04);
     --ds-shadow-border-medium: var(--ds-shadow-border), var(--ds-shadow-medium);
-    --ds-shadow-large: 0px 2px 2px rgba(0, 0, 0, 0.04),
-      0px 8px 16px -4px rgba(0, 0, 0, 0.04);
+    --ds-shadow-large: 0px 2px 2px rgba(0, 0, 0, 0.04), 0px 8px 16px -4px rgba(0, 0, 0, 0.04);
     --ds-shadow-border-large: var(--ds-shadow-border), var(--ds-shadow-large);
-    --ds-shadow-tooltip: var(--ds-shadow-border),
-      0px 1px 1px rgba(0, 0, 0, 0.02), 0px 4px 8px rgba(0, 0, 0, 0.04);
+    --ds-shadow-tooltip: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
+      0px 4px 8px rgba(0, 0, 0, 0.04);
     --ds-shadow-menu: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
-      0px 4px 8px -4px rgba(0, 0, 0, 0.04),
-      0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+      0px 4px 8px -4px rgba(0, 0, 0, 0.04), 0px 16px 24px -8px rgba(0, 0, 0, 0.06);
     --ds-shadow-modal: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
-      0px 8px 16px -4px rgba(0, 0, 0, 0.04),
-      0px 24px 32px -8px rgba(0, 0, 0, 0.06);
-    --ds-shadow-fullscreen: var(--ds-shadow-border),
-      0px 1px 1px rgba(0, 0, 0, 0.02), 0px 8px 16px -4px rgba(0, 0, 0, 0.04),
-      0px 24px 32px -8px rgba(0, 0, 0, 0.06);
-    --ds-focus-ring: 0 0 0 2px var(--ds-background-100),
-      0 0 0 4px var(--ds-focus-color);
+      0px 8px 16px -4px rgba(0, 0, 0, 0.04), 0px 24px 32px -8px rgba(0, 0, 0, 0.06);
+    --ds-shadow-fullscreen: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
+      0px 8px 16px -4px rgba(0, 0, 0, 0.04), 0px 24px 32px -8px rgba(0, 0, 0, 0.06);
+    --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-focus-color);
 
     --geist-success-lighter: #d3e5ff;
     --geist-success-light: #3291ff;
@@ -250,7 +237,7 @@ html {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background:  0 0% 4%;
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -376,31 +363,23 @@ html {
     --ds-shadow-inset: inset 0 0 0 1px hsla(0 0% 100% / 0.1);
     --ds-shadow-border: 0 0 0 1px var(--ds-gray-alpha-400);
     --ds-shadow-small: 0px 1px 2px rgba(0, 0, 0, 0.16);
-    --ds-shadow-input-ring: 0 0 0 1px var(--ds-gray-alpha-600),
-      0 0 0 4px hsla(0, 0%, 100%, 0.24);
-    --ds-shadow-border-small: var(--ds-shadow-border),
-      0px 1px 2px rgba(0, 0, 0, 0.16);
-    --ds-shadow-medium: 0px 2px 2px rgba(0, 0, 0, 0.32),
+    --ds-shadow-input-ring: 0 0 0 1px var(--ds-gray-alpha-600), 0 0 0 4px hsla(0, 0%, 100%, 0.24);
+    --ds-shadow-border-small: var(--ds-shadow-border), 0px 1px 2px rgba(0, 0, 0, 0.16);
+    --ds-shadow-medium: 0px 2px 2px rgba(0, 0, 0, 0.32), 0px 8px 8px -8px rgba(0, 0, 0, 0.16);
+    --ds-shadow-border-medium: var(--ds-shadow-border), 0px 2px 2px rgba(0, 0, 0, 0.32),
       0px 8px 8px -8px rgba(0, 0, 0, 0.16);
-    --ds-shadow-border-medium: var(--ds-shadow-border),
-      0px 2px 2px rgba(0, 0, 0, 0.32), 0px 8px 8px -8px rgba(0, 0, 0, 0.16);
-    --ds-shadow-large: 0px 2px 2px rgba(0, 0, 0, 0.04),
+    --ds-shadow-large: 0px 2px 2px rgba(0, 0, 0, 0.04), 0px 8px 16px -4px rgba(0, 0, 0, 0.04);
+    --ds-shadow-border-large: var(--ds-shadow-border), 0px 2px 2px rgba(0, 0, 0, 0.04),
       0px 8px 16px -4px rgba(0, 0, 0, 0.04);
-    --ds-shadow-border-large: var(--ds-shadow-border),
-      0px 2px 2px rgba(0, 0, 0, 0.04), 0px 8px 16px -4px rgba(0, 0, 0, 0.04);
-    --ds-shadow-tooltip: var(--ds-shadow-border),
-      0px 1px 1px rgba(0, 0, 0, 0.02), 0px 4px 8px rgba(0, 0, 0, 0.04);
+    --ds-shadow-tooltip: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
+      0px 4px 8px rgba(0, 0, 0, 0.04);
     --ds-shadow-menu: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
-      0px 4px 8px -4px rgba(0, 0, 0, 0.04),
-      0px 16px 24px -8px rgba(0, 0, 0, 0.06);
+      0px 4px 8px -4px rgba(0, 0, 0, 0.04), 0px 16px 24px -8px rgba(0, 0, 0, 0.06);
     --ds-shadow-modal: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
-      0px 8px 16px -4px rgba(0, 0, 0, 0.04),
-      0px 24px 32px -8px rgba(0, 0, 0, 0.06);
-    --ds-shadow-fullscreen: var(--ds-shadow-border),
-      0px 1px 1px rgba(0, 0, 0, 0.02), 0px 8px 16px -4px rgba(0, 0, 0, 0.04),
-      0px 24px 32px -8px rgba(0, 0, 0, 0.06);
-    --ds-focus-ring: 0 0 0 2px var(--ds-background-100),
-      0 0 0 4px var(--ds-focus-color);
+      0px 8px 16px -4px rgba(0, 0, 0, 0.04), 0px 24px 32px -8px rgba(0, 0, 0, 0.06);
+    --ds-shadow-fullscreen: var(--ds-shadow-border), 0px 1px 1px rgba(0, 0, 0, 0.02),
+      0px 8px 16px -4px rgba(0, 0, 0, 0.04), 0px 24px 32px -8px rgba(0, 0, 0, 0.06);
+    --ds-focus-ring: 0 0 0 2px var(--ds-background-100), 0 0 0 4px var(--ds-focus-color);
 
     --geist-success-lighter: #d3e5ff;
     --geist-success-light: #3291ff;
@@ -420,7 +399,7 @@ html {
 
 @font-face {
   font-family: Geist;
-  src: url("./assets/fonts/geist-sans/Geist-Regular.ttf");
+  src: url('./assets/fonts/geist-sans/Geist-Regular.ttf');
 }
 
 @font-face {
@@ -549,4 +528,3 @@ html {
   font-weight: 900;
   font-style: normal;
 }
-

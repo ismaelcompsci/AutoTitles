@@ -51,19 +51,17 @@ const AppHeader = () => {
   const step = useAtomValue(taskStepAtom)
 
   return (
-    <div className="header h-10 flex items-center gap-8 shrink-0 bg-background">
+    <div className="header h-10 flex items-center gap-8 shrink-0 bg-background [app-region:drag;]">
       <div
         style={{
           paddingLeft: '81px'
         }}
         className="flex"
-      >
-        {/* <SidebarTrigger className="[app-region:no-drag;]" /> */}
-      </div>
+      ></div>
       <div className="flex items-center gap-2 min-w-0 w-full">
         <div className="flex flex-shrink gap-2 w-full">
-          <div className="[app-region:no-drag;] w-full flex justify-center items-center">
-            {file?.name}
+          <div className=" w-full flex justify-center items-center">
+            <span className="[app-region:no-drag;] cursor-default">{file?.name}</span>
           </div>
         </div>
       </div>
