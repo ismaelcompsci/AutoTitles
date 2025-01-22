@@ -1,13 +1,15 @@
 import { AudioLines, Paperclip } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Button } from '../ui/button'
-import { WhisperInputDialog } from '../whisper-input-dialog'
+import { WhisperInputConfiguration } from '../whisper-input-configuration'
 import { WhisperDownloadModelsDialog } from '../whisper-download-models-dialog'
 import { supportedFormats } from '@/lib/utils'
+import { fileInputAtom } from '@/state/whisper-model-state'
+import { useAtom } from 'jotai'
 
 export const FileInput = () => {
-  const [file, setFile] = useState<File | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [file, setFile] = useAtom(fileInputAtom)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleClick = () => {
@@ -18,22 +20,12 @@ export const FileInput = () => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
       setFile(selectedFile)
-      setIsModalOpen(true)
     }
   }
 
-  const handleModalOpenChange = (open: boolean) => {
-    if (!open) {
-      setFile(null)
-      setIsModalOpen(false)
-      return
-    }
-
-    setIsModalOpen(open)
-  }
   return (
-    <div className="flex flex-col justify-center text-foreground h-full">
-      {!file && (
+    <div className="flex flex-col justify-center items-center text-foreground flex-1">
+      {!file ? (
         <div className="flex flex-col justify-center items-center">
           <AudioLines className="h-28 w-28 text-muted-foreground" />
 
@@ -62,9 +54,9 @@ export const FileInput = () => {
             </Button>
           </div>
         </div>
+      ) : (
+        <WhisperInputConfiguration file={file} />
       )}
-
-      <WhisperInputDialog file={file} open={isModalOpen} onOpenChange={handleModalOpenChange} />
 
       <WhisperDownloadModelsDialog />
     </div>

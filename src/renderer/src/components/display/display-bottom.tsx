@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { MediaPlayerControls } from './media-player-controls'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { activeRegionIdAtom } from '@/state/media-display-state'
@@ -12,29 +12,30 @@ export const DisplayBottom = () => {
   const ref = useRef<HTMLDivElement | null>(null)
   const wavesurfer = useAtomValue(wavesurferAtom)
 
-  const [size, setSize] = useState<{ width: number; height: number }>()
-
   const calContainerSize = () => {
-    const size = ref?.current?.closest('.media-player-wrapper')?.getBoundingClientRect()
+    const height = ref?.current?.getBoundingClientRect().height ?? 0
+    const size = window.document.body.getBoundingClientRect()
     const controlsSize = ref?.current?.querySelector('.media-controls')?.getBoundingClientRect()
 
     if (!size) return
 
-    setSize({ width: size.width, height: size.height })
     if (wavesurfer) {
       wavesurfer.setOptions({
-        height: size.height - (controlsSize?.height ?? 0)
+        height: height - (controlsSize?.height ?? 0),
+        width: size.width
       })
     }
   }
 
-  const debouncedCalContainerSize = debounce(calContainerSize, 100)
+  const debouncedCalContainerSize = debounce(calContainerSize, 80)
 
   useEffect(() => {
     if (!ref?.current) return
     setWaveformContainerRefAtom(ref)
 
     if (!wavesurfer) return
+
+    window.addEventListener('resize', debouncedCalContainerSize)
 
     let rafId: number
     const observer = new ResizeObserver(() => {
@@ -43,11 +44,13 @@ export const DisplayBottom = () => {
         debouncedCalContainerSize()
       })
     })
-    observer.observe(ref.current)
+
+    observer.observe(ref?.current)
 
     return () => {
       observer.disconnect()
       cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', debouncedCalContainerSize)
     }
   }, [ref, wavesurfer])
 
@@ -71,18 +74,11 @@ export const DisplayBottom = () => {
   }, [regions])
 
   return (
-    <div ref={ref} className="media-player-wrapper min-h-24 w-full bg-background-200 h-full">
+    <div ref={ref} className="min-h-24 w-full bg-background-200 h-full">
       <MediaPlayerControls />
 
       <div className="media-player-wrapper max-w-full overflow-x-scroll">
-        <div
-          style={{
-            width: `${size?.width}px`,
-            height: `${size?.height}px`
-          }}
-          className="waveform-container"
-          id="waveform"
-        />
+        <div className="waveform-container" id="waveform" />
       </div>
     </div>
   )

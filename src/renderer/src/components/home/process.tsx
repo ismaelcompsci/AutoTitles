@@ -32,7 +32,7 @@ export const Process = () => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col justify-center h-full flex-1 w-full">
       <WhisperSubtitleDisplay />
     </div>
   )

@@ -5,7 +5,6 @@ import { activeRegionIdAtom } from '@/state/media-display-state'
 import { clampPosition, cn, millisecondsToTimestamp } from '@/lib/utils'
 import { durationAtom, panelsRefsAtom, wavesurferAtom } from '@/state/whisper-model-state'
 import { WhisperResponse } from 'src/shared/shared'
-import { Separator } from '../ui/separator'
 
 export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
   const activeRegionId = useAtomValue(activeRegionIdAtom)
@@ -37,8 +36,7 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
         if (scrollAreaRef.current) {
           // 256 height of video
           // 48 height of buttons
-          // 16 padding
-          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - 256 - 48 - 16}px`
+          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - 256 - 48}px`
         }
       })
     })
@@ -67,11 +65,11 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
         const active = id === activeRegionId
 
         return (
-          <div id={id} key={id} className="max-w-md md:max-w-lg lg:max-w-3xl mx-auto">
+          <div id={id} key={id} className="">
             <div
               onClick={() => handleRowClicked(start)}
               className={cn(
-                'w-full group flex items-start space-x-4 px-2 p-3 hover:bg-gray-200 transition-colors rounded-md',
+                'group flex items-start space-x-4 px-2 p-3 hover:bg-gray-200 transition-colors rounded-md',
                 active ? 'bg-teal-100 text-teal-700 hover:bg-teal-200' : undefined
               )}
             >
@@ -90,11 +88,6 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
           </div>
         )
       })}
-      <div className="flex items-center gap-2 justify-center py-2">
-        <Separator className="w-24" />
-        <span className="text-muted-foreground text-[10px]">end</span>
-        <Separator className="w-24" />
-      </div>
     </ScrollArea>
   )
 }

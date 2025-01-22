@@ -19,7 +19,7 @@ const buttonVariants = cva(
           'text-[#0a0a0a] bg-amber-800 border-amber-800 hover:bg-[#d27504] hover:border-[#d27504'
       },
       size: {
-        tiny: 'h-6 px-0.5 rounded-[4px] text-xs leading-4',
+        tiny: 'h-6 px-0 rounded-[4px] text-xs leading-4',
         sm: 'h-8 px-1.5 rounded-md text-sm leading-5',
         small: 'h-8 px-1.5 rounded-md text-sm leading-5',
         medium: 'h-10 px-2.5 rounded-md text-sm leading-5',

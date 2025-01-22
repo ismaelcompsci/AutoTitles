@@ -1,17 +1,19 @@
-import { Home } from './components/home/home'
-import { ThemeProvider } from './components/providers'
+import { Route, HashRouter as Router, Routes } from 'react-router-dom'
+import { DashboardPage } from './components/general/dashboard'
 import { TailwindIndicator } from './components/tailwind-indicator'
-import { Toaster } from './components/ui/toaster'
+import { Toaster } from 'sonner'
 
 function App(): JSX.Element {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="h-screen w-screen bg-background-100">
-        <Home />
-        <Toaster richColors position="top-right" />
-        <TailwindIndicator />
-      </div>
-    </ThemeProvider>
+    <>
+      <Toaster richColors position="top-right" />
+      <TailwindIndicator />
+      <Router>
+        <Routes>
+          <Route path="*" element={<DashboardPage />} />
+        </Routes>
+      </Router>
+    </>
   )
 }
 

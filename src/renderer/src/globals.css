@@ -9,10 +9,35 @@
 
 html, body {
   scroll-behavior: smooth;
+  position: fixed;
 }
+
+body {
+  height:  100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+html {
+  height:  100%;
+  width: 100%;
+}
+
+.header {
+  -webkit-app-region: drag;
+  /* -webkit-user-select: none; */
+  /* cursor: default; */
+}
+
 
 @layer base {
   :root {
+    font-size: 15px;
+    
     --color-1: 0 100% 63%;
     --color-2: 270 100% 63%;
     --color-3: 210 100% 63%;
@@ -225,7 +250,7 @@ html, body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-background:  0 0% 4%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -233,8 +258,8 @@ html, body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --ds-background-100: 0 0% 4%;
-    --ds-background-200: 0 0% 0%;
+    --ds-background-100: 240 3% 6%;
+    --ds-background-200: 0 0% 4%;
 
     --ds-border: 0 0% 14%;
 

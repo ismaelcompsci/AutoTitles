@@ -6,6 +6,7 @@ import { RefObject } from 'react'
 import type WaveSurfer from 'wavesurfer.js'
 import type Regions from 'wavesurfer.js/dist/plugins/regions'
 
+export const fileInputAtom = atom<File | null>(null)
 export const downloadedModelsAtom = atomWithStorage<{ name: string; path: string }[]>(
   'downloaded-models-key',
   []

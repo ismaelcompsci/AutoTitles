@@ -19,8 +19,11 @@ function createWindow(): void {
     width: 900,
     height: 670,
     show: false,
-    autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    /* You can use *titleBarOverlay: true* to use the original Windows controls */
+    titleBarOverlay: true,
     ...(process.platform === 'linux' ? { icon } : {}),
+    trafficLightPosition: { x: 10, y: 10 },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,

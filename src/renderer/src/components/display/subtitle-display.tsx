@@ -18,6 +18,7 @@ import { useAtomValue, useAtom, useSetAtom } from 'jotai'
 import { WhisperResponse } from 'src/shared/shared'
 import WaveSurfer from 'wavesurfer.js'
 import Regions from 'wavesurfer.js/dist/plugins/regions'
+import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resizeable'
 import { getPanelGroupElement, getResizeHandleElement } from 'react-resizable-panels'
 import { getPanelElement } from 'react-resizable-panels'
@@ -64,10 +65,10 @@ export const WhisperSubtitleDisplay = () => {
     if (!waveformContainerRef?.current) return
     // if (decoded) return
     // if (regions) return
-    // if (!media.converted_browser_video_supported_path) return
+    // if (!media.original_input_path) return
+
     console.log('[initializeWavesurfer] initing wavesurfer...')
 
-    const height = waveformContainerRef.current.getBoundingClientRect().height
     const container = waveformContainerRef.current.querySelector(
       '.waveform-container'
     ) as HTMLElement | null
@@ -82,14 +83,24 @@ export const WhisperSubtitleDisplay = () => {
       barRadius: 2,
       autoScroll: true,
       media: mediaProvider,
-      minPxPerSec: 150,
+      minPxPerSec: 1,
       hideScrollbar: true,
       fillParent: true,
-      height: height,
+      // height: height,
+      // width: width,
       cursorColor: 'hsl(173 80% 36%)',
       duration: task?.media.duration,
       backend: task?.media.type === 'video' ? 'MediaElement' : 'WebAudio'
     })
+
+    ws.registerPlugin(
+      ZoomPlugin.create({
+        // the amount of zoom per wheel step, e.g. 0.5 means a 50% magnification per scroll
+        scale: 0.5,
+        // Optionally, specify the maximum pixels-per-second factor while zooming
+        maxZoom: 100
+      })
+    )
 
     // TODO CHANGE THIS TO SUPPORTED
     const fileURL = `file://${media.original_input_path}`
@@ -152,7 +163,6 @@ export const WhisperSubtitleDisplay = () => {
     const bottomPanelElement = getPanelElement('bottom-panel')
     const topPanelElement = getPanelElement('top-panel')
     const resizeHandleElement = getResizeHandleElement('resize-handle')
-
     // If you want to, you can store them in a ref to pass around
     refs.current = {
       groupElement,
@@ -164,7 +174,7 @@ export const WhisperSubtitleDisplay = () => {
   }, [])
 
   return (
-    <ResizablePanelGroup id="group" direction="vertical" className="min-h-screen max-w-full">
+    <ResizablePanelGroup id="group" direction="vertical">
       <ResizablePanel id="top-panel" defaultSize={70} minSize={20}>
         <DisplayTop />
       </ResizablePanel>

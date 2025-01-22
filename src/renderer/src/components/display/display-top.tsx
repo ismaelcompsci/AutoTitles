@@ -8,7 +8,7 @@ import { SubtitleList } from './subtitle-list'
 
 export const DisplayTop = () => {
   return (
-    <div className="items-center flex flex-col pt-4">
+    <div className="pt-5">
       {/* video */}
       <DisplayTopVideo />
 
@@ -22,8 +22,8 @@ export const DisplayTopSubtitles = () => {
   const task = useAtomValue(currentTaskAtom)
 
   return (
-    <div className="display-subtitles w-full">
-      <div className="flex justify-between items-center py-2 max-w-md md:max-w-lg lg:max-w-3xl mx-auto">
+    <>
+      <div className="flex justify-between items-center py-2">
         <div className="flex gap-2">
           <Button
             variant={'secondary'}
@@ -71,7 +71,7 @@ export const DisplayTopSubtitles = () => {
       </div>
 
       {task?.response ? <SubtitleList subtitles={task?.response} /> : <div>making...</div>}
-    </div>
+    </>
   )
 }
 
@@ -94,7 +94,7 @@ export const DisplayTopVideo = () => {
   }, [])
 
   return (
-    <div className="display-video h-64 w-full flex justify-center">
+    <div className="w-full flex justify-center">
       {type === 'video' ? (
         <video
           onPlay={() => setPlaying(true)}
