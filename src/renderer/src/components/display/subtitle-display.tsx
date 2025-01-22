@@ -83,7 +83,7 @@ export const WhisperSubtitleDisplay = () => {
       barRadius: 2,
       autoScroll: true,
       media: mediaProvider,
-      minPxPerSec: 1,
+      minPxPerSec: 100,
       hideScrollbar: true,
       fillParent: true,
       // height: height,
