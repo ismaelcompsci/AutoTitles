@@ -97,7 +97,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
     }
 
     setCurrentTask(task)
-    setStep('PROCESS')
+    setStep('TRANSCRIBE')
   }
 
   const formatSecondsToTimeStamp = (seconds: number) => {

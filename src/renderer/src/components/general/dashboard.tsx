@@ -9,7 +9,7 @@ import { Settings } from '../settings/settings'
 
 export const DashboardPage = () => {
   return (
-    <SidebarProvider className="text-sm bg-background-100 flex flex-row w-full h-full min-h-full items-stretch">
+    <SidebarProvider className="dark text-sm bg-background-100 flex flex-row w-full h-full min-h-full items-stretch">
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <AppSidebar />
         <div className="flex flex-col justify-center h-full flex-1">
@@ -19,8 +19,8 @@ export const DashboardPage = () => {
               'media-player-wrapper flex flex-col border-[0.5px] flex-1 overflow-hidden relative place-items-stretch bg-background-200'
             )}
           >
-            <Routes>
-              <Route path="*" element={<Home />} />
+            <Routes location={'/home'}>
+              <Route path="/home" element={<Home />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
           </main>

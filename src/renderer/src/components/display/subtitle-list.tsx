@@ -2,9 +2,17 @@ import { ScrollArea } from '../ui/scrollarea'
 import { useEffect, useRef } from 'react'
 import { useAtomValue } from 'jotai'
 import { activeRegionIdAtom } from '@/state/media-display-state'
-import { clampPosition, cn, millisecondsToTimestamp } from '@/lib/utils'
-import { durationAtom, panelsRefsAtom, wavesurferAtom } from '@/state/whisper-model-state'
+import { clampPosition, cn, millisecondsToTimestamp, scrollItemToCenter } from '@/lib/utils'
+import {
+  currentTaskAtom,
+  durationAtom,
+  panelsRefsAtom,
+  wavesurferAtom
+} from '@/state/whisper-model-state'
 import { WhisperResponse } from 'src/shared/shared'
+import { selectAtom } from 'jotai/utils'
+
+const mediaTypeAtom = selectAtom(currentTaskAtom, (task) => task?.media.type)
 
 export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
   const activeRegionId = useAtomValue(activeRegionIdAtom)
@@ -12,34 +20,44 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const refs = useAtomValue(panelsRefsAtom)
   const wavesurfer = useAtomValue(wavesurferAtom)
-
-  const scrollToActive = (id: string) => {
-    const activeElement = document.getElementById(id)
-    if (!activeElement) return
-    activeElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
-  }
+  const mediaType = useAtomValue(mediaTypeAtom)
 
   useEffect(() => {
     if (!activeRegionId) return
 
-    setTimeout(() => {
-      scrollToActive(activeRegionId)
-    }, 1)
+    const activeElement = document.getElementById(activeRegionId) as HTMLElement | null | undefined
+
+    const container = scrollAreaRef.current
+
+    if (!activeElement) return
+    if (!container) return
+
+    scrollItemToCenter(activeElement, container)
   }, [activeRegionId])
 
   useEffect(() => {
     if (!refs?.current) return
     if (!refs.current.bottomPanelElement) return
+    const defaultHeight = mediaType === 'video' ? 254 : 0
+
+    // height does not change
+    const subtitleControlsHeight =
+      refs.current?.topPanelElement?.querySelector('#subtitle-controls')?.getBoundingClientRect()
+        .height ?? 12
+
+    const topVideoHeight =
+      refs.current?.topPanelElement?.querySelector('#media-display-top')?.getBoundingClientRect()
+        .height ?? defaultHeight
 
     let rafId: null | number
     const observer = new ResizeObserver(([entry]) => {
       rafId = requestAnimationFrame(() => {
         const containerHeight = refs.current?.groupElement?.getBoundingClientRect().height ?? 0
         const bottomPanelHeight = entry.contentRect.height
+
         if (scrollAreaRef.current) {
-          // 256 height of video
-          // 43 height of buttons
-          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - 258 - 43}px`
+          // 20 padding top
+          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - topVideoHeight - subtitleControlsHeight - 20}px`
         }
       })
     })
@@ -59,35 +77,34 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
   }
 
   return (
-    <ScrollArea ref={scrollAreaRef} className="w-full min-h-24">
-      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-t from-background-200 via-transparent to-transparent from-1% via-1% to-5%" />
-      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-b from-background-200 via-transparent to-transparent from-1% via-1% to-5%" />
+    <div ref={scrollAreaRef} className="w-full min-h-24 overflow-auto">
+      <ScrollArea>
+        {subtitles?.map((subtitle, i) => {
+          const start = clampPosition(duration, subtitle.from / 1000)
+          const end = clampPosition(duration, subtitle.to / 1000)
 
-      {subtitles?.map((subtitle, i) => {
-        const start = clampPosition(duration, subtitle.from / 1000)
-        const end = clampPosition(duration, subtitle.to / 1000)
+          const id = `id-${start}-${end}`
+          const active = id === activeRegionId
 
-        const id = `id-${start}-${end}`
-        const active = id === activeRegionId
-
-        return (
-          <div
-            onClick={() => handleRowClicked(start)}
-            key={id}
-            id={id}
-            className={cn(
-              'p-4 rounded-lg transition-colors hover:bg-gray-200',
-              active && 'bg-gray-100',
-              i !== subtitles.length ? 'mb-1' : undefined
-            )}
-          >
-            <div className="text-sm text-muted-foreground">
-              {millisecondsToTimestamp(subtitle.from)}
+          return (
+            <div
+              onClick={() => handleRowClicked(start)}
+              key={id}
+              id={id}
+              className={cn(
+                'p-4 rounded-lg transition-colors hover:bg-gray-200',
+                active && 'bg-gray-100',
+                i !== subtitles.length ? 'mb-1' : undefined
+              )}
+            >
+              <div className="text-sm text-muted-foreground">
+                {millisecondsToTimestamp(subtitle.from)}
+              </div>
+              <div className="text-sm">{subtitle.text}</div>
             </div>
-            <div className="text-sm">{subtitle.text}</div>
-          </div>
-        )
-      })}
-    </ScrollArea>
+          )
+        })}
+      </ScrollArea>
+    </div>
   )
 }

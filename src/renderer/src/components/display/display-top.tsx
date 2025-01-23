@@ -23,7 +23,7 @@ export const DisplayTopSubtitles = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center py-2">
+      <div id="subtitle-controls" className="flex justify-between items-center py-2">
         <div className="flex gap-2">
           <Button
             variant={'secondary'}
@@ -94,7 +94,7 @@ export const DisplayTopVideo = () => {
   }, [])
 
   return (
-    <div className="w-full flex justify-center">
+    <div id="media-display-top" className="w-full flex justify-center">
       {type === 'video' ? (
         <video
           onPlay={() => setPlaying(true)}

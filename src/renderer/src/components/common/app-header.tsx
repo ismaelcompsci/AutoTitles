@@ -10,15 +10,23 @@ import { SidebarTrigger } from '../ui/sidebar'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
-
 export const AppHeader = () => {
   const file = useAtomValue(fileInputAtom)
   const step = useAtomValue(taskStepAtom)
   // force update on nav
   useNavigate()
-  useLocation()
+  const location = useLocation()
 
   const hasHistory = window.history.state.idx !== 0
+
+  const handleButton = () => {
+    if (location.pathname === '/' || location.pathname === '/home') {
+    } else {
+    }
+
+    console.log(location)
+    console.log('handleButton')
+  }
 
   return (
     <div className="header h-10 flex items-center gap-8 shrink-0 bg-background [app-region:drag;]">
@@ -67,7 +75,12 @@ export const AppHeader = () => {
         {step && step !== 'DONE' ? (
           <Gauge size="tiny" value={calcPercentForStep(step)} />
         ) : (
-          <Button variant={'tertiary'} size={'tiny'} className="[app-region:no-drag;]">
+          <Button
+            onClick={handleButton}
+            variant={'tertiary'}
+            size={'tiny'}
+            className="[app-region:no-drag;]"
+          >
             <Plus className="w-4 h-4" />
           </Button>
         )}

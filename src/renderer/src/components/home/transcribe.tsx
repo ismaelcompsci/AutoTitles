@@ -12,7 +12,7 @@ const stepToInfoMap: Record<Step, string> = {
   TRANSCRIBING: 'Generating subtitles for you...'
 }
 
-export const Process = () => {
+export const Transcribe = () => {
   const task = useAtomValue(currentTaskAtom)
 
   const { generateTranscription } = useTranscription()

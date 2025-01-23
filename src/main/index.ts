@@ -16,9 +16,12 @@ import { IPCCHANNELS } from '../shared/constants'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
     show: false,
+    width: 1024,
+    height: 728,
+    minWidth: 250,
+    minHeight: 150,
+    frame: false,
     titleBarStyle: 'hidden',
     /* You can use *titleBarOverlay: true* to use the original Windows controls */
     titleBarOverlay: true,
@@ -31,8 +34,9 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.show()
+    mainWindow.focus()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
