@@ -29,6 +29,7 @@ const TimeSlider = () => {
 
   return (
     <Slider
+      className="flex-1"
       value={[(currentTime / duration) * 100]}
       onValueChange={([v]) => wavesurfer?.seekTo((duration * (v / 100)) / duration)}
     />
@@ -85,7 +86,7 @@ const MediaPlayerPlayPauseButton = () => {
 }
 export const MediaPlayerControls = () => {
   return (
-    <div className="media-controls border-t-[1px] p-4 flex flex-col w-full">
+    <div className="media-controls p-4 flex flex-col w-full">
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">

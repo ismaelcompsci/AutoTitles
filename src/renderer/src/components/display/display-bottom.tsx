@@ -27,7 +27,7 @@ export const DisplayBottom = () => {
     }
   }
 
-  const debouncedCalContainerSize = debounce(calContainerSize, 80)
+  const debouncedCalContainerSize = debounce(calContainerSize, 100)
 
   useEffect(() => {
     if (!ref?.current) return

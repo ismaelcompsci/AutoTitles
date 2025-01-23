@@ -24,17 +24,7 @@ export const Home = () => {
     return <div>SOMETHING WENT WRONG</div>
   }
 
-  return (
-    <div className="flex flex-col justify-center h-full flex-1">
-      <AppHeader />
-      <main
-        className={cn(
-          'media-player-wrapper flex flex-col border-[0.5px] flex-1 overflow-hidden relative place-items-stretch bg-background-200'
-          // !isMobile && 'rounded-md mt-0 mr-2 mb-2 ml-0'
-        )}
-      >
-        {renderPage()}
-      </main>
-    </div>
-  )
+  return renderPage()
+  // </main>
+  // </div>
 }

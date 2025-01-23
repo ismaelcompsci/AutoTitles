@@ -4,7 +4,6 @@ import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import { handleFileOpen } from './handle/file'
 import { downloadWhisperModel } from './handle/download-whisper-model'
 import { ElectronDownloadManager } from 'electron-dl-manager'
 import { probe } from './handle/ffmpeg'
@@ -12,6 +11,7 @@ import { transcribe } from './handle/transcribe'
 import { encodeForWhisper } from './handle/encode-for-whisper'
 import { encodeAudioForBrowser } from './handle/encode-for-browser'
 import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
+import { IPCCHANNELS } from '../shared/constants'
 
 function createWindow(): void {
   // Create the browser window.
@@ -63,13 +63,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle('dialog:openFile', handleFileOpen)
-  ipcMain.handle('download-whisper-modal', downloadWhisperModel)
-  ipcMain.handle('probe', probe)
-  ipcMain.handle('whisper:transcribe', transcribe)
-  ipcMain.handle('whisper:encode', encodeForWhisper)
-  ipcMain.handle('whisper:encodeaudio', encodeAudioForBrowser)
-  ipcMain.handle('filesystem:getDownloadsFolder', getDownloadsFolder)
+  ipcMain.handle(IPCCHANNELS.DOWNLOAD_WHISPER_MODEL, downloadWhisperModel)
+  ipcMain.handle(IPCCHANNELS.PROBE, probe)
+  ipcMain.handle(IPCCHANNELS.WHISPER_TRANSCRIBE, transcribe)
+  ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE, encodeForWhisper)
+  ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
+  ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
 
   createWindow()
 

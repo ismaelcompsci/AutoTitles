@@ -60,8 +60,8 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
 
   return (
     <ScrollArea ref={scrollAreaRef} className="w-full min-h-24">
-      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-t from-background-200 via-transparent to-transparent from-1% via-10% to-50%" />
-      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-b from-background-200 via-transparent to-transparent from-1% via-10% to-50%" />
+      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-t from-background-200 via-transparent to-transparent from-1% via-1% to-5%" />
+      <div className="absolute h-full w-full pointer-events-none bg-gradient-to-b from-background-200 via-transparent to-transparent from-1% via-1% to-5%" />
 
       {subtitles?.map((subtitle, i) => {
         const start = clampPosition(duration, subtitle.from / 1000)

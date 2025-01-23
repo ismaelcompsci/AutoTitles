@@ -8,7 +8,6 @@ import type { FfprobeData } from 'fluent-ffmpeg'
 import { WhisperParams, WhisperResponse } from 'src/shared/shared'
 
 export interface IAPI {
-  openFile: (options: Electron.OpenDialogOptions) => Promise<Electron.OpenDialogReturnValue>
   downloadWhisperModel: (
     args: DownloadWhisperModel
   ) => Promise<{ alreadyExisted: boolean; downloadId: string }>

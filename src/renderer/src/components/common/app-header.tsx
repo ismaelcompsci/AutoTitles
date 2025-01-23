@@ -2,16 +2,23 @@ import { Step } from '@/hooks/use-transcription'
 import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
 import { useAtomValue } from 'jotai'
 import { selectAtom } from 'jotai/utils'
-import { Plus } from 'lucide-react'
+import { MoveLeft, MoveRight, Plus } from 'lucide-react'
 
 import { Gauge } from '../ui/gauge'
 import { Button } from '../ui/button'
+import { SidebarTrigger } from '../ui/sidebar'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 
 export const AppHeader = () => {
   const file = useAtomValue(fileInputAtom)
   const step = useAtomValue(taskStepAtom)
+  // force update on nav
+  useNavigate()
+  useLocation()
+
+  const hasHistory = window.history.state.idx !== 0
 
   return (
     <div className="header h-10 flex items-center gap-8 shrink-0 bg-background [app-region:drag;]">
@@ -19,8 +26,35 @@ export const AppHeader = () => {
         style={{
           paddingLeft: '81px'
         }}
-        className="flex"
-      ></div>
+        className="flex gap-2"
+      >
+        <SidebarTrigger />
+
+        <Button
+          onClick={() => {
+            window.history.back()
+          }}
+          disabled={!hasHistory}
+          className="px-0 text-muted-foreground disabled:text-muted [app-region:no-drag;] disabled:bg-background-100 disabled:border-none"
+          size={'tiny'}
+          shape="square"
+          variant={'tertiary'}
+        >
+          <MoveLeft className="h-4 w-4" />
+        </Button>
+
+        <Button
+          className="px-0 text-muted-foreground disabled:text-muted [app-region:no-drag;] disabled:bg-background-100 disabled:border-none"
+          size={'tiny'}
+          shape="square"
+          variant={'tertiary'}
+          onClick={() => {
+            window.history.forward()
+          }}
+        >
+          <MoveRight className="h-4 w-4 text-muted" />
+        </Button>
+      </div>
       <div className="flex items-center gap-2 min-w-0 w-full">
         <div className="flex flex-shrink gap-2 w-full">
           <div className=" w-full flex justify-center items-center">

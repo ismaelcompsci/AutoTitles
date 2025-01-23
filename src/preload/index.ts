@@ -1,16 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { IAPI } from '../renderer/renderer'
+import { IPCCHANNELS } from '../shared/constants'
 
 const api: IAPI = {
   // main <-> renderer
-  openFile: (args) => ipcRenderer.invoke('dialog:openFile', args),
-  downloadWhisperModel: (args) => ipcRenderer.invoke('download-whisper-modal', args),
-  probe: (args) => ipcRenderer.invoke('probe', args),
-  transcribe: (args) => ipcRenderer.invoke('whisper:transcribe', args),
-  encodeForWhisper: (args) => ipcRenderer.invoke('whisper:encode', args),
-  encodeAudioForBrowser: (args) => ipcRenderer.invoke('whisper:encodeaudio', args),
-  getDownloadsFolder: () => ipcRenderer.invoke('filesystem:getDownloadsFolder'),
+  downloadWhisperModel: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_WHISPER_MODEL, args),
+  probe: (args) => ipcRenderer.invoke(IPCCHANNELS.PROBE, args),
+  transcribe: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_TRANSCRIBE, args),
+  encodeForWhisper: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE, args),
+  encodeAudioForBrowser: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE_AUDIO, args),
+  getDownloadsFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER),
 
   // main -> renderer
   onDownloadStarted: (callback) =>
