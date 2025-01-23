@@ -1,5 +1,5 @@
 import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
-import { useTheme } from './providers'
+import { useTheme } from '../providers'
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme()

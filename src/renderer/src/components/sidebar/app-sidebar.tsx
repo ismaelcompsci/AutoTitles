@@ -1,19 +1,15 @@
-import { Calendar, Home, Inbox, MoveLeft, MoveRight, Search, Settings } from 'lucide-react'
+import { Home, MoveLeft, MoveRight, Settings } from 'lucide-react'
 
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar
+  SidebarMenuItem
 } from '@/components/ui/sidebar'
 import { Button } from '../ui/button'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { useEffect } from 'react'
 
 // Menu items.
 const items = [
