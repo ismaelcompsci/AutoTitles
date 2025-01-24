@@ -1,5 +1,5 @@
 import path from 'path'
-import { downloadManager } from '@/main'
+import { downloadManager } from '../index'
 import fs from 'fs'
 import { BrowserWindow } from 'electron'
 import os from 'node:os'

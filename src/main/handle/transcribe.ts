@@ -1,6 +1,6 @@
 import { decode } from 'node-wav'
 import fs from 'fs'
-import { WhisperParams, WhisperResponse } from '@/shared/shared'
+import { WhisperParams, WhisperResponse } from '../../shared/models'
 import { Whisper } from 'smart-whisper'
 
 export async function transcribe(

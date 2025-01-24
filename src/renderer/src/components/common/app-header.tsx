@@ -1,15 +1,15 @@
-import { Step } from '@/renderer/src/hooks/use-transcription'
-import { currentTaskAtom, fileInputAtom } from '@/renderer/src/state/whisper-model-state'
+import { Step } from '@/hooks/use-transcription'
+import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
 import { ArrowRight, MoveLeft, MoveRight, Plus } from 'lucide-react'
-import { Gauge } from '@/renderer/src/components/ui/gauge'
-import { Button } from '@/renderer/src/components/ui/button'
-import { SidebarTrigger } from '@/renderer/src/components/ui/sidebar'
+import { Gauge } from '@/components/ui/gauge'
+import { Button } from '@/components/ui/button'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { stepAtom } from '@/renderer/src/state/main-state'
-import { MenuContainer, MenuButton, MenuItem, Menu } from '@/renderer/src/components/ui/dropdown'
-import { Modal } from '@/renderer/src/components/ui/modal'
+import { stepAtom } from '@/state/main-state'
+import { MenuContainer, MenuButton, MenuItem, Menu } from '@/components/ui/dropdown'
+import { Modal } from '@/components/ui/modal'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 export const AppHeader = () => {

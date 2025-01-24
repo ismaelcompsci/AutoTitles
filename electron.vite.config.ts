@@ -23,7 +23,8 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@': path.join(__dirname, 'src')
+        '@renderer': resolve('src/renderer/src'),
+        '@': resolve('src/renderer/src')
       }
     },
     plugins: [react(), nodePolyfills({ include: ['path'] })]
