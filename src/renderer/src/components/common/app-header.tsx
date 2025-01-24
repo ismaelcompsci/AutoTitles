@@ -1,6 +1,6 @@
 import { Step } from '@/hooks/use-transcription'
 import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
 import { MoveLeft, MoveRight, Plus } from 'lucide-react'
 
@@ -8,13 +8,18 @@ import { Gauge } from '../ui/gauge'
 import { Button } from '../ui/button'
 import { SidebarTrigger } from '../ui/sidebar'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { stepAtom } from '@/state/main-state'
+import { MenuContainer, MenuButton, MenuItem, Menu } from '../ui/dropdown'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 export const AppHeader = () => {
+  const setFileInput = useSetAtom(fileInputAtom)
+  const setCurrentTask = useSetAtom(currentTaskAtom)
+  const setCurrentStep = useSetAtom(stepAtom)
   const file = useAtomValue(fileInputAtom)
   const step = useAtomValue(taskStepAtom)
   // force update on nav
-  useNavigate()
+  const nav = useNavigate()
   const location = useLocation()
 
   const hasHistory = window.history.state.idx !== 0
@@ -22,7 +27,12 @@ export const AppHeader = () => {
   const handleButton = () => {
     if (location.pathname === '/' || location.pathname === '/home') {
     } else {
+      nav('/home')
     }
+
+    setFileInput(null)
+    setCurrentStep('INPUT')
+    setCurrentTask(null)
 
     console.log(location)
     console.log('handleButton')
@@ -75,14 +85,23 @@ export const AppHeader = () => {
         {step && step !== 'DONE' ? (
           <Gauge size="tiny" value={calcPercentForStep(step)} />
         ) : (
-          <Button
-            onClick={handleButton}
-            variant={'tertiary'}
-            size={'tiny'}
-            className="[app-region:no-drag;]"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+          <MenuContainer>
+            <MenuButton variant={'tertiary'} size={'tiny'} className="[app-region:no-drag;]">
+              <Plus className="w-4 h-4" />
+            </MenuButton>
+
+            <Menu
+              side="bottom"
+              collisionPadding={{
+                right: 20
+              }}
+            >
+              <MenuItem onClick={handleButton} className="gap-2">
+                <Plus className="w-4 h-4" />
+                New
+              </MenuItem>
+            </Menu>
+          </MenuContainer>
         )}
       </div>
     </div>
