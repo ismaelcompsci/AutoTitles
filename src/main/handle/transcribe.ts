@@ -28,7 +28,6 @@ export async function transcribe(
   const task = await whisper.transcribe(pcm, {
     ...whisperParams,
     suppress_non_speech_tokens: true
-    // n_max_text_ctx: 1
   })
 
   task.on('transcribed', (ev) => {
@@ -36,7 +35,6 @@ export async function transcribe(
   })
 
   const result = await task.result
-
   await whisper.free()
   return result
 }
