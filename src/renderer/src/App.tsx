@@ -6,7 +6,7 @@ import { Toaster } from 'sonner'
 function App(): JSX.Element {
   return (
     <>
-      <Toaster richColors position="top-right" />
+      <Toaster position="top-right" />
       <TailwindIndicator />
       <Router>
         <Routes>

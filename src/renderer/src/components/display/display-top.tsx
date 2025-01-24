@@ -5,10 +5,11 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { playingAtom } from '@/state/media-display-state'
 import { currentTaskAtom, mediaProviderAtom } from '@/state/whisper-model-state'
 import { SubtitleList } from './subtitle-list'
+import { Step } from '@/hooks/use-transcription'
 
 export const DisplayTop = () => {
   return (
-    <div className="pt-5">
+    <div className="pt-5 flex flex-1 flex-col h-full">
       {/* video */}
       <DisplayTopVideo />
 
@@ -18,59 +19,75 @@ export const DisplayTop = () => {
   )
 }
 
+const stepToInfoMap: Record<Step, string> = {
+  AUDIO: 'Converting audio to correct format...',
+  DONE: 'Finished',
+  IDLE: 'Waiting for things...',
+  TRANSCRIBING: 'Generating subtitles for you...'
+}
+
 export const DisplayTopSubtitles = () => {
   const task = useAtomValue(currentTaskAtom)
 
   return (
     <>
-      <div id="subtitle-controls" className="flex justify-between items-center py-2">
-        <div className="flex gap-2">
-          <Button
-            variant={'secondary'}
-            shape="circle"
-            size="tiny"
-            className="flex flex-row border-none"
-          >
-            <CornerUpLeft className="w-4 h-4" />
-          </Button>
-          <Button
-            variant={'secondary'}
-            shape="circle"
-            size="tiny"
-            className=" flex flex-row border-none"
-          >
-            <CornerUpRight className="w-4 h-4" />
-          </Button>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant={'secondary'}
-            shape="circle"
-            size="tiny"
-            className=" flex flex-row border-none"
-          >
-            <Trash2 className="w-4 h-4 " />
-          </Button>
-          <Button
-            variant={'secondary'}
-            shape="circle"
-            size="tiny"
-            className=" flex flex-row border-none"
-          >
-            <Copy className="w-4 h-4 " />
-          </Button>
-          <Button
-            variant={'secondary'}
-            shape="circle"
-            size="tiny"
-            className=" flex flex-row border-none"
-          >
-            <Search className="w-4 h-4 " />
-          </Button>
+      <div className="flex w-full justify-center">
+        <div id="subtitle-controls" className="flex py-2 w-full max-w-3xl gap-2 px-2">
+          <div className="flex gap-2 grow">
+            <Button
+              variant={'secondary'}
+              shape="circle"
+              size="tiny"
+              className="flex flex-row border-none"
+            >
+              <CornerUpLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant={'secondary'}
+              shape="circle"
+              size="tiny"
+              className=" flex flex-row border-none"
+            >
+              <CornerUpRight className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <div className="flex gap-2 shrink">
+            <Button
+              variant={'secondary'}
+              shape="circle"
+              size="tiny"
+              className=" flex flex-row border-none"
+            >
+              <Trash2 className="w-4 h-4 " />
+            </Button>
+            <Button
+              variant={'secondary'}
+              shape="circle"
+              size="tiny"
+              className=" flex flex-row border-none"
+            >
+              <Copy className="w-4 h-4 " />
+            </Button>
+            <Button
+              variant={'secondary'}
+              shape="circle"
+              size="tiny"
+              className=" flex flex-row border-none"
+            >
+              <Search className="w-4 h-4 " />
+            </Button>
+          </div>
         </div>
       </div>
 
-      {task?.response ? <SubtitleList subtitles={task?.response} /> : <div>making...</div>}
+      {task?.response ? (
+        <SubtitleList subtitles={task?.response} />
+      ) : (
+        <div className="flex flex-1 justify-center items-center text-muted-foreground">
+          {stepToInfoMap[task?.step ?? 'IDLE']}
+        </div>
+      )}
     </>
   )
 }

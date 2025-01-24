@@ -77,8 +77,11 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
   }
 
   return (
-    <div ref={scrollAreaRef} className="w-full min-h-24 overflow-auto">
-      <ScrollArea>
+    <div
+      ref={scrollAreaRef}
+      className="w-full overflow-auto justify-center items-center flex flex-1"
+    >
+      <ScrollArea className="max-w-3xl w-full">
         {subtitles?.map((subtitle, i) => {
           const start = clampPosition(duration, subtitle.from / 1000)
           const end = clampPosition(duration, subtitle.to / 1000)
@@ -92,7 +95,7 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
               key={id}
               id={id}
               className={cn(
-                'p-4 rounded-lg transition-colors hover:bg-gray-200',
+                'mx-2 p-4 rounded-lg transition-colors hover:bg-gray-200',
                 active && 'bg-gray-100',
                 i !== subtitles.length ? 'mb-1' : undefined
               )}
