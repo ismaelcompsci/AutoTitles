@@ -73,14 +73,11 @@ export const scrollItemToCenter = (element: HTMLElement, container: HTMLElement)
   if (!element) return
   if (!container) return
 
-  const activeElementTop = element.offsetTop
-  const activeElementHeight = element.offsetHeight
-  const containerHeight = element.clientHeight
+  // const activeElementTop = element.offsetTop
+  // const activeElementHeight = element.offsetHeight
+  // const containerHeight = element.clientHeight
 
-  const scrollPosition = activeElementTop - containerHeight / 2 + activeElementHeight / 2
+  // const scrollPosition = activeElementTop - containerHeight / 2 + activeElementHeight / 2
 
-  container.scrollTo({
-    behavior: 'smooth',
-    top: scrollPosition
-  })
+  element.scrollIntoView({ block: 'center' })
 }

@@ -33,11 +33,16 @@ interface Props {
   file: File | null
 }
 
+type ProbeState = {
+  loading: boolean
+  data: FfprobeData | undefined
+}
+
 export const WhisperInputConfiguration = ({ file }: Props) => {
   const setShowDownloadModalDialog = useSetAtom(showDownloadModalDialogAtom)
   const downloadedModels = useAtomValue(downloadedModelsAtom)
   const setCurrentTask = useSetAtom(currentTaskAtom)
-  const [probeData, setProbeDate] = useState<FfprobeData | undefined>(undefined)
+  const [probeState, setProbeDate] = useState<ProbeState>({ loading: false, data: undefined })
   const setStep = useSetAtom(stepAtom)
 
   const [config, setConfig] = useAtom(whisperUserConfigurationAtom)
@@ -48,12 +53,17 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
         return
       }
 
-      const probedata = await window.api.probe(file?.path)
-      setProbeDate(probedata)
+      setProbeDate({ loading: true, data: undefined })
+
+      const probeState = await window.api.probe(file?.path)
+      setProbeDate({
+        loading: false,
+        data: probeState
+      })
     }
 
     a()
-  }, [file])
+  }, [file?.path])
 
   const handleStartTranscription = async () => {
     if (!config.model) {
@@ -67,7 +77,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
 
     const modelPath = downloadedModels.find((model) => model.name === config.model)?.path
 
-    if (!modelPath || !probeData) {
+    if (!modelPath || probeState.loading) {
       return
     }
 
@@ -83,7 +93,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
     const media: WhisperTaskMedia = {
       original_input_path: file.path,
       folder: path.join(downloadsFolder, taskId),
-      duration: (probeData.streams[0].duration ?? 0) as number,
+      duration: (probeState.data?.streams[0].duration ?? 0) as number,
       type: type
     }
 
@@ -113,8 +123,8 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
   }
 
-  const videoTime = probeData?.format.duration
-    ? formatSecondsToTimeStamp(probeData?.format.duration)
+  const videoTime = probeState.data?.format.duration
+    ? formatSecondsToTimeStamp(probeState.data?.format.duration)
     : undefined
 
   const handleSelectModelChange = (value: WhisperModel) => {
@@ -140,6 +150,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
                 <p className="grow">Model</p>
 
                 <Select
+                  // open={true}
                   disabled={downloadedModels.length === 0}
                   value={config?.model}
                   onValueChange={handleSelectModelChange}
@@ -147,12 +158,11 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
                   <SelectTrigger className="w-fit border-none gap-1 min-w-[140px]">
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background">
                     <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">
-                        Downloaded Models
+                      <SelectLabel className="text-[10px] text-muted-foreground">
+                        Installed Models
                       </SelectLabel>
-                      <SelectSeparator />
                       {downloadedModels.map((model) => {
                         return (
                           <SelectItem key={`${model.name}`} value={model.name}>
@@ -209,7 +219,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
         </div>
       </div>
 
-      <Button onClick={handleStartTranscription} className="mt-12">
+      <Button onClick={handleStartTranscription} className="mt-12" loading={probeState.loading}>
         transcribe
       </Button>
     </div>

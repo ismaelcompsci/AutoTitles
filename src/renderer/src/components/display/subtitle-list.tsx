@@ -57,7 +57,7 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
 
         if (scrollAreaRef.current) {
           // 20 padding top
-          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - topVideoHeight - subtitleControlsHeight - 20}px`
+          scrollAreaRef.current.style.height = `${containerHeight - bottomPanelHeight - topVideoHeight - subtitleControlsHeight}px`
         }
       })
     })
@@ -81,7 +81,7 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
       ref={scrollAreaRef}
       className="w-full overflow-auto justify-center items-center flex flex-1"
     >
-      <ScrollArea className="max-w-3xl w-full">
+      <ScrollArea className="max-w-3xl w-full h-full">
         {subtitles?.map((subtitle, i) => {
           const start = clampPosition(duration, subtitle.from / 1000)
           const end = clampPosition(duration, subtitle.to / 1000)
@@ -95,7 +95,7 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
               key={id}
               id={id}
               className={cn(
-                'mx-2 p-4 rounded-lg transition-colors hover:bg-gray-200',
+                'mx-2 p-4 rounded-lg transition-colors hover:bg-gray-200 relative',
                 active && 'bg-gray-100',
                 i !== subtitles.length ? 'mb-1' : undefined
               )}
@@ -104,6 +104,13 @@ export const SubtitleList = ({ subtitles }: { subtitles: WhisperResponse }) => {
                 {millisecondsToTimestamp(subtitle.from)}
               </div>
               <div className="text-sm">{subtitle.text}</div>
+
+              <div
+                className={cn(
+                  'h-1 w-1 bg-[#50e3c2] absolute rounded-full right-2 top-1/2 -translate-y-1/2',
+                  active ? 'block' : 'hidden'
+                )}
+              />
             </div>
           )
         })}
