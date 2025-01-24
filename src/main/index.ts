@@ -14,17 +14,7 @@ import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 
 const appIcon = nativeImage.createFromPath(icon)
-
 function createWindow(): void {
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'resources')
-    : path.join(__dirname, '../resources')
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths)
-  }
-
-  console.log(getAssetPath('icon.png'))
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     show: false,
