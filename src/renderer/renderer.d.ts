@@ -10,7 +10,7 @@ import { WhisperParams, WhisperResponse } from 'src/shared/shared'
 export interface IAPI {
   downloadWhisperModel: (
     args: DownloadWhisperModel
-  ) => Promise<{ alreadyExisted: boolean; downloadId: string }>
+  ) => Promise<{ alreadyExisted: boolean; downloadId: string; filePath?: string }>
   probe: (file: string) => Promise<FfprobeData>
   transcribe: (whisper: WhisperParams) => Promise<WhisperResponse>
   encodeForWhisper: (file: string) => Promise<string>

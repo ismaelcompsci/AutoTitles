@@ -9,8 +9,8 @@ import { Settings } from '../settings/settings'
 
 export const DashboardPage = () => {
   return (
-    <SidebarProvider className="dark text-sm bg-background-100 flex flex-row w-full h-full min-h-full items-stretch">
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <SidebarProvider className="text-sm bg-background-100 flex flex-row w-full h-full min-h-full items-stretch">
+      <ThemeProvider storageKey="vite-ui-theme">
         <AppSidebar />
         <div className="flex flex-col justify-center h-full flex-1">
           <AppHeader />

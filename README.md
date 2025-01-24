@@ -1,12 +1,11 @@
-# autotitles
+# AutoTitles
 
-An Electron application with React and TypeScript
+Electron app using [Whisper](https://github.com/ggerganov/whisper.cpp) and [smart-whisper](https://github.com/JacobLinCool/smart-whisper) to transcribe audio files.
 
 ## Recommended IDE Setup
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-## Project Setup
 
 ### Install
 
@@ -19,27 +18,7 @@ $ npm install
 ```bash
 $ npm run dev
 ```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
-```
-
-npx cmake-js compile -T addon.node -B ../../whisper-node/Release
-
-npx cmake-js compile -T addon.node -B Release
-
-
 TODO
-- check if input is audio or video
-- check if input is compatible with browser
- - if not convert 
 - clean up generated audio files
+- add error state to task
+    - handle error state

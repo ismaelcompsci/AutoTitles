@@ -1,5 +1,5 @@
-import { app, shell, BrowserWindow, ipcMain, nativeImage, Tray } from 'electron'
-import path, { join } from 'path'
+import { app, shell, BrowserWindow, ipcMain, nativeImage } from 'electron'
+import path from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // @ts-ignore
@@ -30,7 +30,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     trafficLightPosition: { x: 10, y: 10 },
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false,
       webSecurity: false
     }
@@ -51,7 +51,7 @@ function createWindow(): void {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 }
 

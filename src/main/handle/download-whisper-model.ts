@@ -1,9 +1,15 @@
 import path from 'path'
 import { downloadManager } from '..'
-import { existsSync } from 'fs'
-import { app, BrowserWindow } from 'electron'
+import fs from 'fs'
+import { BrowserWindow } from 'electron'
+import os from 'node:os'
 
-export const models = [
+const root = path.join(os.homedir(), '.autotitles')
+const models = path.join(root, 'models')
+
+fs.mkdirSync(models, { recursive: true })
+
+export const MODELS = [
   'tiny',
   'tiny.en',
   'base',
@@ -36,23 +42,23 @@ export async function downloadWhisperModel(
 
   const { model } = args
 
-  if (!models.includes(model)) {
-    throw new Error(`Invalid whisper model ${model}. Available: ${models.join(', ')}`)
+  // @ts-ignore
+  if (!MODELS.includes(model)) {
+    throw new Error(`Invalid whisper model ${model} . Available: ${MODELS.join(', ')}`)
   }
 
-  const modelFolder = path.join(app.getPath('userData'), 'models')
-  const modelFilePath = getModelPath(modelFolder, model)
-  if (existsSync(modelFilePath)) {
-    return { alreadyExisted: true }
+  const filename = `ggml-${model}.bin`
+  const modelFilePath = path.join(models, filename)
+  if (fs.existsSync(modelFilePath)) {
+    return { alreadyExisted: true, filePath: modelFilePath }
   }
 
   let downloadId
-  const filename = `ggml-${model}.bin`
   const baseModelUrl = `https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model}.bin`
 
   downloadId = await downloadManager.download({
     url: baseModelUrl,
-    directory: modelFilePath,
+    directory: models,
     saveAsFilename: filename,
     window: browserWindow,
     callbacks: {
@@ -87,10 +93,6 @@ export async function downloadWhisperModel(
   })
 
   return { alreadyExisted: false, downloadId }
-}
-
-export const getModelPath = (folder: string, model: WhisperModel) => {
-  return path.join(folder, `ggml-${model}.bin`)
 }
 
 export interface DownloadStarted {

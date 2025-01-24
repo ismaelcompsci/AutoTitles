@@ -37,16 +37,33 @@ export const WhisperDownloadModelsDialog = () => {
 
         return [...p, { name: model, path: filePath }]
       })
+
       setDownload((p) => ({ ...p, loading: false }))
+      toast.success(`${model} installed`)
     })
   }, [])
 
   const handleDownloadClick = async (model: WhisperModel) => {
-    const { alreadyExisted, downloadId } = await window.api.downloadWhisperModel({ model: model })
+    const { alreadyExisted, downloadId, filePath } = await window.api.downloadWhisperModel({
+      model: model
+    })
 
     if (alreadyExisted) {
-      // VALIDATE THIS IS TRUE USER COULD HAVE DELETED AN STATE IS OUT OF SYNC NOW
-      toast.error(`${model} is already installed`)
+      setDownloadedModels((p) => {
+        if (!filePath) {
+          return p
+        }
+
+        const exists = p.find((m) => m.name === model && m.path === filePath)
+
+        if (exists) {
+          return [...p]
+        }
+
+        return [...p, { name: model, path: filePath }]
+      })
+
+      toast.success(`${model} installed`)
       return
     }
 

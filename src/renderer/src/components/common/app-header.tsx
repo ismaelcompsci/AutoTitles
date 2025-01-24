@@ -2,7 +2,7 @@ import { Step } from '@/hooks/use-transcription'
 import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
-import { MoveLeft, MoveRight, Plus } from 'lucide-react'
+import { ArrowRight, MoveLeft, MoveRight, Plus } from 'lucide-react'
 
 import { Gauge } from '../ui/gauge'
 import { Button } from '../ui/button'
@@ -81,7 +81,7 @@ export const AppHeader = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex items-center gap-1 mr-6">
+      <div className="flex-1 flex flex-row items-center gap-2 mr-4">
         {step && step !== 'DONE' ? (
           <Gauge size="tiny" value={calcPercentForStep(step)} />
         ) : (
@@ -96,12 +96,22 @@ export const AppHeader = () => {
                 right: 20
               }}
             >
-              <MenuItem onClick={handleButton} className="gap-2">
+              <MenuItem onClick={handleButton} className="gap-2 h-9 text-sm">
                 <Plus className="w-4 h-4" />
                 New
               </MenuItem>
             </Menu>
           </MenuContainer>
+        )}
+
+        {step === 'DONE' && (
+          <Button
+            size={'tiny'}
+            className="[app-region:no-drag;]"
+            prefix={<ArrowRight className="h-4 w-4" />}
+          >
+            Export
+          </Button>
         )}
       </div>
     </div>

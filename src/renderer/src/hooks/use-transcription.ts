@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import { WhisperParams, WhisperResponse } from '../../../shared/shared'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { currentTaskAtom } from '@/state/whisper-model-state'
+import { toast } from 'sonner'
 
 export type WhisperTaskMedia = {
   type: 'audio' | 'video'
@@ -43,47 +44,53 @@ export const useTranscription = () => {
     setTranscribing(true)
     setTask(task)
 
-    setTask({ ...task, step: 'AUDIO' })
-    const encodedFilePath = await window.api.encodeForWhisper(task.media.original_input_path)
-    // convert to correct browser audio if it is not supported on web
-    // const browserencodedaudio = await window.api.encodeAudioForBrowser({
-    //   inputPath: task.media.original_input_path,
-    //   outputPath: audiopath
-    // })
+    try {
+      setTask({ ...task, step: 'AUDIO' })
+      const encodedFilePath = await window.api.encodeForWhisper(task.media.original_input_path)
+      // convert to correct browser audio if it is not supported on web
+      // const browserencodedaudio = await window.api.encodeAudioForBrowser({
+      //   inputPath: task.media.original_input_path,
+      //   outputPath: audiopath
+      // })
 
-    const whisperParams: WhisperParams = {
-      language: 'en',
-      model: task.model,
-      audioInput: encodedFilePath,
-      maxLen: task.maxLen === 0 ? 60 : task.maxLen,
-      translate: false,
-      split_on_word: task.maxLen > 0,
-      tokenTimestamps: task.maxLen > 0
-    }
+      const whisperParams: WhisperParams = {
+        language: 'en',
+        model: task.model,
+        audioInput: encodedFilePath,
+        maxLen: task.maxLen === 0 ? 60 : task.maxLen,
+        translate: false,
+        split_on_word: task.maxLen > 0,
+        tokenTimestamps: task.maxLen > 0
+      }
 
-    setTask({ ...task, step: 'TRANSCRIBING' })
+      setTask({ ...task, step: 'TRANSCRIBING' })
 
-    const response = await window.api.transcribe(whisperParams)
-    const media: WhisperTaskMedia = {
-      type: task.media.type,
-      original_input_path: task.media.original_input_path,
-      whisper_compatible_audio_input_path: encodedFilePath,
-      converted_browser_video_supported_path: task.media.original_input_path,
-      folder: task.media.folder,
-      duration: task.media.duration
-    }
+      const response = await window.api.transcribe(whisperParams)
+      const media: WhisperTaskMedia = {
+        type: task.media.type,
+        original_input_path: task.media.original_input_path,
+        whisper_compatible_audio_input_path: encodedFilePath,
+        converted_browser_video_supported_path: task.media.original_input_path,
+        folder: task.media.folder,
+        duration: task.media.duration
+      }
 
-    // remove whisper input
-    flushSync(() => {
-      setTask({
-        ...task,
-        response: response,
-        media: media,
-        step: 'DONE'
+      // remove whisper input
+      flushSync(() => {
+        setTask({
+          ...task,
+          response: response,
+          media: media,
+          step: 'DONE'
+        })
       })
-    })
 
-    setTranscribing(false)
+      setTranscribing(false)
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Something went wrong!'
+      console.error(e)
+      toast.error(message)
+    }
   }
 
   return {

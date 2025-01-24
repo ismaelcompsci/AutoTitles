@@ -12,15 +12,16 @@ export const encodeForWhisper = async (_event: Electron.IpcMainInvokeEvent, inpu
       .audioBitrate(16000)
       .audioFilters(['lowpass=3000', 'highpass=200', 'afftdn=nf=-80'])
       .audioChannels(1)
-      .on('error', (err) => {
-        console.error(err)
-        reject(err)
+      .on('error', (error) => {
+        console.error(error)
+        reject(new Error('Could not decode video. Video is not supported'))
       })
       .on('end', () => {
         resolve(newFile)
       })
       .save(newFile)
   })
+
   return newFile
 }
 

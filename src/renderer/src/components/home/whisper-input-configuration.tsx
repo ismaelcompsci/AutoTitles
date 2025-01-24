@@ -167,6 +167,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
                 <Button
                   size={'tiny'}
                   variant={'secondary'}
+                  className="text-[10px] text-muted-foreground"
                   onClick={() => setShowDownloadModalDialog(true)}
                 >
                   Download models...
