@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto'
-import { ffmpeg } from './ffmpeg'
-import { DEFAULT_DOWNLOADS_DIR } from './filesystem'
+import { ffmpeg } from '@/main/handle/ffmpeg'
+import { DEFAULT_DOWNLOADS_DIR } from '@/main/handle/filesystem'
 
 export const encodeForWhisper = async (_event: Electron.IpcMainInvokeEvent, inputFile: string) => {
   const newFile = `${DEFAULT_DOWNLOADS_DIR}/${randomUUID()}.wav`

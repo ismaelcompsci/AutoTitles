@@ -4,14 +4,14 @@ import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import { downloadWhisperModel } from './handle/download-whisper-model'
+import { downloadWhisperModel } from '@/main/handle/download-whisper-model'
 import { ElectronDownloadManager } from 'electron-dl-manager'
-import { probe } from './handle/ffmpeg'
-import { transcribe } from './handle/transcribe'
-import { encodeForWhisper } from './handle/encode-for-whisper'
-import { encodeAudioForBrowser } from './handle/encode-for-browser'
-import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
-import { IPCCHANNELS } from '../shared/constants'
+import { probe } from '@/main/handle/ffmpeg'
+import { transcribe } from '@/main/handle/transcribe'
+import { encodeForWhisper } from '@/main/handle/encode-for-whisper'
+import { encodeAudioForBrowser } from '@/main/handle/encode-for-browser'
+import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from '@/main/handle/filesystem'
+import { IPCCHANNELS } from '@/shared/constants'
 
 const appIcon = nativeImage.createFromPath(icon)
 function createWindow(): void {

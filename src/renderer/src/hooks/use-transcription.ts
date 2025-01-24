@@ -1,8 +1,7 @@
 import { flushSync } from 'react-dom'
-// @ts-ignore
-import { WhisperParams, WhisperResponse } from '../../../shared/shared'
+import { WhisperParams, WhisperResponse } from '@/shared/shared'
 import { atom, useAtom, useSetAtom } from 'jotai'
-import { currentTaskAtom } from '@/state/whisper-model-state'
+import { currentTaskAtom } from '@/renderer/src/state/whisper-model-state'
 import { toast } from 'sonner'
 
 export type WhisperTaskMedia = {

@@ -1,5 +1,5 @@
 import path from 'path'
-import { ffmpeg } from './ffmpeg'
+import { ffmpeg } from '@/main/handle/ffmpeg'
 import fs from 'fs'
 
 export const encodeAudioForBrowser = async (

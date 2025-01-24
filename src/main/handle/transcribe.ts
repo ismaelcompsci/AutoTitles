@@ -1,6 +1,6 @@
 import { decode } from 'node-wav'
 import fs from 'fs'
-import { WhisperParams, WhisperResponse } from '../../shared/shared'
+import { WhisperParams, WhisperResponse } from '@/shared/shared'
 import { Whisper } from 'smart-whisper'
 
 export async function transcribe(
@@ -30,9 +30,9 @@ export async function transcribe(
     suppress_non_speech_tokens: true
   })
 
-  task.on('transcribed', (ev) => {
-    console.log('OUT', ev)
-  })
+  // task.on('transcribed', (ev) => {
+  //   console.log('OUT', ev)
+  // })
 
   const result = await task.result
   await whisper.free()

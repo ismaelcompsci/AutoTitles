@@ -1,15 +1,15 @@
-import { Step } from '@/hooks/use-transcription'
-import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
+import { Step } from '@/renderer/src/hooks/use-transcription'
+import { currentTaskAtom, fileInputAtom } from '@/renderer/src/state/whisper-model-state'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { selectAtom } from 'jotai/utils'
 import { ArrowRight, MoveLeft, MoveRight, Plus } from 'lucide-react'
-
-import { Gauge } from '../ui/gauge'
-import { Button } from '../ui/button'
-import { SidebarTrigger } from '../ui/sidebar'
+import { Gauge } from '@/renderer/src/components/ui/gauge'
+import { Button } from '@/renderer/src/components/ui/button'
+import { SidebarTrigger } from '@/renderer/src/components/ui/sidebar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { stepAtom } from '@/state/main-state'
-import { MenuContainer, MenuButton, MenuItem, Menu } from '../ui/dropdown'
+import { stepAtom } from '@/renderer/src/state/main-state'
+import { MenuContainer, MenuButton, MenuItem, Menu } from '@/renderer/src/components/ui/dropdown'
+import { Modal } from '@/renderer/src/components/ui/modal'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 export const AppHeader = () => {
@@ -104,15 +104,7 @@ export const AppHeader = () => {
           </MenuContainer>
         )}
 
-        {step === 'DONE' && (
-          <Button
-            size={'tiny'}
-            className="[app-region:no-drag;]"
-            prefix={<ArrowRight className="h-4 w-4" />}
-          >
-            Export
-          </Button>
-        )}
+        {step === 'DONE' && <ExportDialog />}
       </div>
     </div>
   )
@@ -131,4 +123,27 @@ const calcPercentForStep = (step: Step) => {
     default:
       return 0
   }
+}
+
+export const ExportDialog = () => {
+  return (
+    <Modal.Modal>
+      <Modal.Trigger asChild>
+        <Button
+          size={'tiny'}
+          className="[app-region:no-drag;]"
+          prefix={<ArrowRight className="h-4 w-4" />}
+        >
+          Export
+        </Button>
+      </Modal.Trigger>
+      <Modal.Content>
+        <Modal.Body>body</Modal.Body>
+        <Modal.Actions>
+          <Modal.Cancel>Cancel</Modal.Cancel>
+          <Modal.Action>Continue</Modal.Action>
+        </Modal.Actions>
+      </Modal.Content>
+    </Modal.Modal>
+  )
 }
