@@ -70,7 +70,7 @@ const MenuLink = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     href: string
   }
->(({ className, href, children, ...props }, ref) => (
+>(({ className, href, children, ...props }) => (
   <MenuItem asChild {...props}>
     <Link to={href}>{children}</Link>
   </MenuItem>

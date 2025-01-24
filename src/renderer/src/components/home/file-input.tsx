@@ -6,7 +6,6 @@ import { WhisperDownloadModelsDialog } from './whisper-download-models-dialog'
 import { supportedFormats } from '@/lib/utils'
 import { fileInputAtom } from '@/state/whisper-model-state'
 import { useAtom } from 'jotai'
-import { Slider } from '../ui/slider'
 
 export const FileInput = () => {
   const [file, setFile] = useAtom(fileInputAtom)

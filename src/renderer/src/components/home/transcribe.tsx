@@ -2,15 +2,15 @@ import { currentTaskAtom } from '@/state/whisper-model-state'
 import { useAtomValue } from 'jotai'
 import './p.css'
 import { useEffect } from 'react'
-import { Step, useTranscription } from '@/hooks/use-transcription'
+import { useTranscription } from '@/hooks/use-transcription'
 import { WhisperSubtitleDisplay } from '../display/subtitle-display'
 
-const stepToInfoMap: Record<Step, string> = {
-  AUDIO: 'Converting audio to correct format...',
-  DONE: 'Finished',
-  IDLE: 'Waiting for things...',
-  TRANSCRIBING: 'Generating subtitles for you...'
-}
+// const stepToInfoMap: Record<Step, string> = {
+//   AUDIO: 'Converting audio to correct format...',
+//   DONE: 'Finished',
+//   IDLE: 'Waiting for things...',
+//   TRANSCRIBING: 'Generating subtitles for you...'
+// }
 
 export const Transcribe = () => {
   const task = useAtomValue(currentTaskAtom)
