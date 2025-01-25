@@ -17,6 +17,11 @@ export interface IAPI {
   encodeAudioForBrowser: (args: { inputPath: string; outputPath: string }) => Promise<string>
   getDownloadsFolder: () => Promise<string>
   chooseFolder: () => Promise<string | undefined>
+  exportSubtitles: (args: {
+    filepath: string
+    data: { from: number; to: number; text: string }[]
+    type: string
+  }) => Promise<string>
 
   onDownloadStarted: (callback: (value: DownloadStarted) => void) => Electron.IpcRenderer
   onDownloadProgress: (callback: (value: DownloadProgress) => void) => Electron.IpcRenderer

@@ -23,7 +23,6 @@ import {
 } from '../ui/select'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { generateSRT } from '@/lib/utils'
 import path from 'path'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
@@ -164,17 +163,26 @@ export const ExportDialog = () => {
   }
 
   const handleExport = async () => {
-    // export
-
     if (!subtitles) {
       toast.error('No subtitles')
-
       return
     }
 
-    const srt = generateSRT(subtitles)
-    const filename = `expoted.srt`
+    const filename = `exported.srt`
     const filepath = path.join(folder, filename)
+
+    try {
+      await window.api.exportSubtitles({
+        filepath,
+        data: subtitles,
+        type: format || 'srt'
+      })
+
+      toast.success('Subtitles exported successfully')
+    } catch (error) {
+      toast.error('Failed to export subtitles')
+      console.error(error)
+    }
   }
 
   return (

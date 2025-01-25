@@ -12,6 +12,7 @@ import { encodeForWhisper } from './handle/encode-for-whisper'
 import { encodeAudioForBrowser } from './handle/encode-for-browser'
 import { chooseFolder, DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
+import { exportSubtitles } from './handle/export-subtitles'
 
 const appIcon = nativeImage.createFromPath(icon)
 function createWindow(): void {
@@ -76,6 +77,7 @@ app.whenReady().then(() => {
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, chooseFolder)
+  ipcMain.handle(IPCCHANNELS.EXPORT_SUBTITLES, exportSubtitles)
 
   createWindow()
 

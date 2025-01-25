@@ -10,5 +10,6 @@ export const IPCCHANNELS = {
   WHISPER_ENCODE_AUDIO: 'whisper:encodeaudio',
   FILESYSTEM_GET_DOWNLOADS_FOLDER: 'filesystem:getDownloadsFolder',
   PROBE: 'filesystem:probe',
-  FILESYSTEM_CHOOSE_FOLDER: 'filesystem:chooseFolder'
-}
+  FILESYSTEM_CHOOSE_FOLDER: 'filesystem:chooseFolder',
+  EXPORT_SUBTITLES: 'export-subtitles'
+} as const
