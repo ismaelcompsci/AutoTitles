@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
-import { WhisperResponse } from '@/shared/shared'
+import { WhisperResponse } from '../../../shared/models'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
@@ -99,7 +99,7 @@ function formatTime(ms: number) {
 }
 
 // Generate SRT content
-export function generateSRT(data: WhisperResponse) {
+export function generateSRT(data: WhisperResponse): string {
   return data
     .map((item, index) => {
       const startTime = formatTime(item.from)

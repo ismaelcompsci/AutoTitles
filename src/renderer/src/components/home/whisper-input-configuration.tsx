@@ -4,7 +4,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
@@ -28,6 +27,8 @@ import path from 'path'
 import { WhisperTask } from '@/hooks/use-transcription'
 import { WhisperTaskMedia } from '@/hooks/use-transcription'
 import { getMediaType } from '@/lib/utils'
+import { ConfigSection } from '../common/config-section'
+import { ConfigItem } from '../common/config-item'
 
 interface Props {
   file: File | null
@@ -141,82 +142,67 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
       <div className="h-8" />
 
       <div className="flex flex-col gap-12">
-        <div className="flex flex-col gap-4">
-          <span>General</span>
-          <div className="border rounded-md bg-background-100">
-            <div className="px-4">
-              {/* model */}
-              <div className="h-12 flex flex-row items-center gap-1 border-b">
-                <p className="grow">Model</p>
+        <ConfigSection title="General">
+          <ConfigItem label="Model" divider>
+            <div className="grow" />
+            <Select
+              disabled={downloadedModels.length === 0}
+              value={config?.model}
+              onValueChange={handleSelectModelChange}
+            >
+              <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent className="bg-background">
+                <SelectGroup>
+                  <SelectLabel className="text-[10px] text-muted-foreground">
+                    Installed Models
+                  </SelectLabel>
+                  {downloadedModels.map((model) => {
+                    return (
+                      <SelectItem key={`${model.name}`} value={model.name}>
+                        {model.name}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
 
-                <Select
-                  // open={true}
-                  disabled={downloadedModels.length === 0}
-                  value={config?.model}
-                  onValueChange={handleSelectModelChange}
-                >
-                  <SelectTrigger className="w-fit border-none gap-1 min-w-[140px]">
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background">
-                    <SelectGroup>
-                      <SelectLabel className="text-[10px] text-muted-foreground">
-                        Installed Models
-                      </SelectLabel>
-                      {downloadedModels.map((model) => {
-                        return (
-                          <SelectItem key={`${model.name}`} value={model.name}>
-                            {model.name}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            <Button
+              size={'tiny'}
+              variant={'secondary'}
+              className="text-[10px] text-muted-foreground"
+              onClick={() => setShowDownloadModalDialog(true)}
+            >
+              Download models...
+            </Button>
+          </ConfigItem>
 
-                <Button
-                  size={'tiny'}
-                  variant={'secondary'}
-                  className="text-[10px] text-muted-foreground"
-                  onClick={() => setShowDownloadModalDialog(true)}
-                >
-                  Download models...
-                </Button>
-              </div>
+          <ConfigItem label="Limit Characters per Segments/Line">
+            <div className="grow" />
+            <NumberInput
+              value={Number(config.maxLen)}
+              onChange={handleMaxCharPerSegmentInputChange}
+            />
+          </ConfigItem>
+        </ConfigSection>
 
-              {/* max chars */}
-
-              <div className="h-12 flex items-center gap-1">
-                <p className="grow">Limit Characters per Segments/Line</p>
-                <NumberInput
-                  value={Number(config.maxLen)}
-                  onChange={handleMaxCharPerSegmentInputChange}
-                />
-              </div>
+        <ConfigSection title="Info">
+          <ConfigItem label="" className="text-sm text-muted-foreground">
+            <div className="flex flex-row grow gap-4 items-center">
+              <FileVolume className="h-4 w-4" />
+              <span className="line-clamp-1 pr-4 text-balance">{file?.name}</span>
             </div>
-          </div>
-        </div>
 
-        <div className="flex flex-col gap-4">
-          <span>info</span>
-          <div className="border rounded-md bg-background-100">
-            <div className="px-4">
-              <div className="h-12 flex items-center text-sm text-muted-foreground">
-                <div className="flex flex-row grow gap-4 items-center">
-                  <FileVolume className="h-4 w-4" />
-
-                  <span className="line-clamp-1 pr-4 text-balance">{file?.name}</span>
-                </div>
-
-                {videoTime ? (
-                  <div className="font-gesit-mono">{videoTime}</div>
-                ) : (
-                  <Loader2 className="h-2 w-2 animate-spin" />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+            <div className="grow" />
+            {videoTime ? (
+              <div className="font-gesit-mono">{videoTime}</div>
+            ) : (
+              <Loader2 className="h-2 w-2 animate-spin" />
+            )}
+          </ConfigItem>
+        </ConfigSection>
       </div>
 
       <Button onClick={handleStartTranscription} className="mt-12" loading={probeState.loading}>

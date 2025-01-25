@@ -10,7 +10,7 @@ import { probe } from './handle/ffmpeg'
 import { transcribe } from './handle/transcribe'
 import { encodeForWhisper } from './handle/encode-for-whisper'
 import { encodeAudioForBrowser } from './handle/encode-for-browser'
-import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
+import { chooseFolder, DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 
 const appIcon = nativeImage.createFromPath(icon)
@@ -75,6 +75,7 @@ app.whenReady().then(() => {
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE, encodeForWhisper)
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
+  ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, chooseFolder)
 
   createWindow()
 

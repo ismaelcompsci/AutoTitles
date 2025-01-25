@@ -11,6 +11,7 @@ const api: IAPI = {
   encodeForWhisper: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE, args),
   encodeAudioForBrowser: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE_AUDIO, args),
   getDownloadsFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER),
+  chooseFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER),
 
   // main -> renderer
   onDownloadStarted: (callback) =>

@@ -9,7 +9,7 @@ import {
   panelsRefsAtom,
   wavesurferAtom
 } from '@/state/whisper-model-state'
-import { WhisperResponse } from 'src/shared/shared'
+import { WhisperResponse } from '../../../../shared/models'
 import { selectAtom } from 'jotai/utils'
 
 const mediaTypeAtom = selectAtom(currentTaskAtom, (task) => task?.media.type)

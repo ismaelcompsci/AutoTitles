@@ -10,6 +10,21 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { stepAtom } from '@/state/main-state'
 import { MenuContainer, MenuButton, MenuItem, Menu } from '@/components/ui/dropdown'
 import { Modal } from '@/components/ui/modal'
+import { ConfigSection } from './config-section'
+import { ConfigItem } from './config-item'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '../ui/select'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { generateSRT } from '@/lib/utils'
+import path from 'path'
 
 const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 export const AppHeader = () => {
@@ -125,7 +140,43 @@ const calcPercentForStep = (step: Step) => {
   }
 }
 
+const ExportOptions = [
+  {
+    label: '.SRT',
+    value: 'srt'
+  }
+]
+
+const downloadsFolder = await window.api.getDownloadsFolder()
+
+const subtitlesAtom = selectAtom(currentTaskAtom, (task) => task?.response)
 export const ExportDialog = () => {
+  const [format, setFormat] = useState<string>()
+  const [folder, setFolder] = useState<string>(downloadsFolder)
+  const subtitles = useAtomValue(subtitlesAtom)
+
+  const handleClick = async () => {
+    const folder = await window.api.chooseFolder()
+
+    if (folder) {
+      setFolder(folder)
+    }
+  }
+
+  const handleExport = async () => {
+    // export
+
+    if (!subtitles) {
+      toast.error('No subtitles')
+
+      return
+    }
+
+    const srt = generateSRT(subtitles)
+    const filename = `expoted.srt`
+    const filepath = path.join(folder, filename)
+  }
+
   return (
     <Modal.Modal>
       <Modal.Trigger asChild>
@@ -138,10 +189,61 @@ export const ExportDialog = () => {
         </Button>
       </Modal.Trigger>
       <Modal.Content>
-        <Modal.Body>body</Modal.Body>
+        <Modal.Body>
+          <Modal.Header>
+            <Modal.Title>Export Manager</Modal.Title>
+          </Modal.Header>
+
+          <ConfigSection title="General">
+            <ConfigItem label="Format" divider>
+              <div className="grow" />
+              <div>
+                <Select value={format} onValueChange={setFormat}>
+                  <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
+                    <SelectValue placeholder="Select a format" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    <SelectGroup>
+                      <SelectLabel className="text-[10px] text-muted-foreground">
+                        Supported Export Formats
+                      </SelectLabel>
+                      {ExportOptions.map((option) => {
+                        return (
+                          <SelectItem key={`${option.value}`} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </ConfigItem>
+
+            <ConfigItem
+              label="Export Folder"
+              // GET DEFAULT FOLDER
+              sublabel={folder ? folder : downloadsFolder}
+            >
+              <div className="grow" />
+
+              <Button
+                className="text-sm w-32"
+                onClick={handleClick}
+                variant={'secondary'}
+                size={'sm'}
+              >
+                Select Folder
+              </Button>
+            </ConfigItem>
+          </ConfigSection>
+        </Modal.Body>
+
         <Modal.Actions>
           <Modal.Cancel>Cancel</Modal.Cancel>
-          <Modal.Action>Continue</Modal.Action>
+          <Modal.Action onClick={handleExport} disabled={!format}>
+            Continue
+          </Modal.Action>
         </Modal.Actions>
       </Modal.Content>
     </Modal.Modal>

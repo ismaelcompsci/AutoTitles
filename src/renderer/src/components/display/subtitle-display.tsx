@@ -15,13 +15,14 @@ import {
   ResizeablePanelRef
 } from '@/state/whisper-model-state'
 import { useAtomValue, useAtom, useSetAtom } from 'jotai'
-import { WhisperResponse } from 'src/shared/shared'
+
 import WaveSurfer from 'wavesurfer.js'
 import Regions from 'wavesurfer.js/dist/plugins/regions'
 import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '../ui/resizeable'
 import { getPanelGroupElement, getResizeHandleElement } from 'react-resizable-panels'
 import { getPanelElement } from 'react-resizable-panels'
+import { WhisperResponse } from 'src/shared/models'
 
 export const WhisperSubtitleDisplay = () => {
   const setPanelsRef = useSetAtom(panelsRefsAtom)

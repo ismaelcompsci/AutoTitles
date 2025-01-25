@@ -5,7 +5,7 @@ import type {
   DownloadWhisperModel
 } from '../main/handle/download-whisper-model'
 import type { FfprobeData } from 'fluent-ffmpeg'
-import { WhisperParams, WhisperResponse } from 'src/shared/shared'
+import { WhisperParams, WhisperResponse } from '../shared/models'
 
 export interface IAPI {
   downloadWhisperModel: (
@@ -16,6 +16,7 @@ export interface IAPI {
   encodeForWhisper: (file: string) => Promise<string>
   encodeAudioForBrowser: (args: { inputPath: string; outputPath: string }) => Promise<string>
   getDownloadsFolder: () => Promise<string>
+  chooseFolder: () => Promise<string | undefined>
 
   onDownloadStarted: (callback: (value: DownloadStarted) => void) => Electron.IpcRenderer
   onDownloadProgress: (callback: (value: DownloadProgress) => void) => Electron.IpcRenderer
