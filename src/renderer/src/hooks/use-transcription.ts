@@ -1,8 +1,8 @@
-import { flushSync } from 'react-dom'
 import { atom, useAtom, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
-import { currentTaskAtom } from '@/state/whisper-model-state'
+import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
 import { WhisperParams, WhisperResponse } from '../../../shared/models'
+import { stepAtom } from '@/state/main-state'
 
 export type WhisperTaskMedia = {
   type: 'audio' | 'video'
@@ -34,6 +34,8 @@ export type WhisperTask = {
 export const transcribingAtom = atom(false)
 
 export const useTranscription = () => {
+  const setFile = useSetAtom(fileInputAtom)
+  const setStep = useSetAtom(stepAtom)
   const setTask = useSetAtom(currentTaskAtom)
   const [transcribing, setTranscribing] = useAtom(transcribingAtom)
 
@@ -75,20 +77,25 @@ export const useTranscription = () => {
       }
 
       // remove whisper input
-      flushSync(() => {
-        setTask({
-          ...task,
-          response: response,
-          media: media,
-          step: 'DONE'
-        })
+      // flushSync(() => {
+      setTask({
+        ...task,
+        response: response,
+        media: media,
+        step: 'DONE'
       })
+      // })
 
       setTranscribing(false)
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Something went wrong!'
       console.error(e)
       toast.error(message)
+      setTask(null)
+      setStep('INPUT')
+      setFile(null)
+    } finally {
+      setTranscribing(false)
     }
   }
 

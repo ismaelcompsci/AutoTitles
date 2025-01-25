@@ -30,10 +30,6 @@ export async function transcribe(
     suppress_non_speech_tokens: true
   })
 
-  // task.on('transcribed', (ev) => {
-  //   console.log('OUT', ev)
-  // })
-
   const result = await task.result
   await whisper.free()
   return result

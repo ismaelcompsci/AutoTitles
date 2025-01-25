@@ -64,9 +64,9 @@ export const WhisperSubtitleDisplay = () => {
     if (!media) return
     if (!mediaProvider) return
     if (!waveformContainerRef?.current) return
-    // if (decoded) return
-    // if (regions) return
-    // if (!media.original_input_path) return
+    if (decoded) return
+    if (regions) return
+    if (!media.original_input_path) return
 
     console.log('[initializeWavesurfer] initing wavesurfer...')
 
@@ -129,6 +129,10 @@ export const WhisperSubtitleDisplay = () => {
     return () => {
       if (wavesurfer) wavesurfer.destroy()
       setDecoded(false)
+      setDuration(0)
+      setPanelsRef(null)
+      setRegions(null)
+      setWavesurfer(null)
     }
   }, [waveformContainerRef?.current, mediaProvider])
 

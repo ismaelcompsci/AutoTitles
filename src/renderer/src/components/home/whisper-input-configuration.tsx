@@ -16,7 +16,6 @@ import {
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { Button } from '../ui/button'
 import { useEffect, useState } from 'react'
-import type { FfprobeData } from 'fluent-ffmpeg'
 import { FileVolume, Loader2 } from 'lucide-react'
 import { WhisperModel } from '@/util/models'
 import NumberInput from '../common/number-input'
@@ -26,7 +25,7 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import { WhisperTask } from '@/hooks/use-transcription'
 import { WhisperTaskMedia } from '@/hooks/use-transcription'
-import { getMediaType } from '@/lib/utils'
+import { getMediaType, MediaType } from '@/lib/utils'
 import { ConfigSection } from '../common/config-section'
 import { ConfigItem } from '../common/config-item'
 
@@ -36,14 +35,14 @@ interface Props {
 
 type ProbeState = {
   loading: boolean
-  data: FfprobeData | undefined
+  data: { duration: number; type: MediaType } | undefined
 }
 
 export const WhisperInputConfiguration = ({ file }: Props) => {
   const setShowDownloadModalDialog = useSetAtom(showDownloadModalDialogAtom)
   const downloadedModels = useAtomValue(downloadedModelsAtom)
   const setCurrentTask = useSetAtom(currentTaskAtom)
-  const [probeState, setProbeDate] = useState<ProbeState>({ loading: false, data: undefined })
+  const [mediaData, setMediaData] = useState<ProbeState>({ loading: false, data: undefined })
   const setStep = useSetAtom(stepAtom)
 
   const [config, setConfig] = useAtom(whisperUserConfigurationAtom)
@@ -54,12 +53,14 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
         return
       }
 
-      setProbeDate({ loading: true, data: undefined })
+      const duration = await loadVideo(file)
 
-      const probeState = await window.api.probe(file?.path)
-      setProbeDate({
+      setMediaData({
         loading: false,
-        data: probeState
+        data: {
+          duration: duration,
+          type: getMediaType(file.type)
+        }
       })
     }
 
@@ -78,7 +79,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
 
     const modelPath = downloadedModels.find((model) => model.name === config.model)?.path
 
-    if (!modelPath || probeState.loading) {
+    if (!modelPath || mediaData.loading) {
       return
     }
 
@@ -94,7 +95,7 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
     const media: WhisperTaskMedia = {
       original_input_path: file.path,
       folder: path.join(downloadsFolder, taskId),
-      duration: (probeState.data?.streams[0].duration ?? 0) as number,
+      duration: mediaData.data?.duration ?? 0,
       type: type
     }
 
@@ -124,8 +125,8 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
   }
 
-  const videoTime = probeState.data?.format.duration
-    ? formatSecondsToTimeStamp(probeState.data?.format.duration)
+  const videoTime = mediaData.data?.duration
+    ? formatSecondsToTimeStamp(mediaData.data?.duration)
     : undefined
 
   const handleSelectModelChange = (value: WhisperModel) => {
@@ -205,9 +206,29 @@ export const WhisperInputConfiguration = ({ file }: Props) => {
         </ConfigSection>
       </div>
 
-      <Button onClick={handleStartTranscription} className="mt-12" loading={probeState.loading}>
+      <Button onClick={handleStartTranscription} className="mt-12" loading={mediaData.loading}>
         transcribe
       </Button>
     </div>
   )
 }
+
+const loadVideo = (file: File): Promise<number> =>
+  new Promise((resolve, reject) => {
+    try {
+      let video = document.createElement('video')
+      video.preload = 'metadata'
+
+      video.onloadedmetadata = function () {
+        resolve(video.duration)
+      }
+
+      video.onerror = function () {
+        reject('Invalid video. Please select a video file.')
+      }
+
+      video.src = window.URL.createObjectURL(file)
+    } catch (e) {
+      reject(e)
+    }
+  })

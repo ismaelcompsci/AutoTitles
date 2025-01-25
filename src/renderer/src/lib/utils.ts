@@ -31,19 +31,21 @@ export const clampPosition = (duration: number, time: number): number => {
 }
 
 export const supportedFormats = [
-  'MP3',
-  'WAV',
-  'M4A',
-  'AAC',
-  'FLAC',
-  'OGG',
-  'OPUS',
-  'MP4',
-  'MOV',
-  'MKV'
+  'wav',
+  'mp3',
+  'm4a',
+  'aac',
+  'flac',
+  'ogg',
+  'opus',
+  'mp4',
+  'mov',
+  'mkv'
 ]
 
-export function getMediaType(mimeType: string): 'video' | 'audio' | 'unsupported' {
+export type MediaType = 'video' | 'audio' | 'unsupported'
+
+export function getMediaType(mimeType: string): MediaType {
   const audioFormats = [
     'audio/mpeg', // MP3
     'audio/wav', // WAV
