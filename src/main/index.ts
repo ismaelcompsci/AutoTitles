@@ -10,11 +10,15 @@ import { probe } from './handle/ffmpeg'
 import { transcribe } from './handle/transcribe'
 import { encodeForWhisper } from './handle/encode-for-whisper'
 import { encodeAudioForBrowser } from './handle/encode-for-browser'
-import { chooseFolder, DEFAULT_DOWNLOADS_DIR, getDownloadsFolder } from './handle/filesystem'
+import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder, showOpenDialog } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 import { exportSubtitles } from './handle/export-subtitles'
+import { QueueManager } from './queue/queue-manager'
+import { JobType, TranscribeJobData } from '../shared/models'
+import { JobDataForType } from '../shared/models'
 
 const appIcon = nativeImage.createFromPath(icon)
+
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -59,7 +63,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -76,7 +80,7 @@ app.whenReady().then(() => {
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE, encodeForWhisper)
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
-  ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, chooseFolder)
+  ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
   ipcMain.handle(IPCCHANNELS.EXPORT_SUBTITLES, exportSubtitles)
 
   createWindow()
@@ -105,3 +109,50 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 export const downloadManager = new ElectronDownloadManager()
+setupQueueHandlers()
+
+// Move IPC handlers to a separate file
+async function setupQueueHandlers() {
+  await QueueManager.getInstance().init()
+
+  ipcMain.handle('queue.getTranscribeOptions', (_event) => {
+    return QueueManager.getInstance().getTranscribeOptions()
+  })
+
+  ipcMain.handle(
+    IPCCHANNELS.CREATE_JOB,
+    <T extends JobType>(_event, args: { type: T; data: JobDataForType<T> }) => {
+      const { type, data } = args
+      return QueueManager.getInstance().createJob(type, data)
+    }
+  )
+  ipcMain.handle(IPCCHANNELS.QUEUE_PENDING_JOBS, () => {
+    return QueueManager.getInstance().queuePendingJobs()
+  })
+
+  ipcMain.handle(IPCCHANNELS.GET_JOBLIST, <T extends JobType>(_event, args: { type: T }) => {
+    const { type } = args
+    const jobs = QueueManager.getInstance().getJobList(type)
+
+    return jobs.map((job) => {
+      switch (type) {
+        case 'Transcribe':
+          const data = job.data as TranscribeJobData
+
+          return {
+            id: job.id,
+            fileName: data.fileName,
+            duration: data.duration,
+            filePath: data.filePath
+          }
+
+        case 'Export':
+          return {
+            id: job.id
+          }
+        default:
+          throw new Error(`Unsupported job type: ${type}`)
+      }
+    })
+  })
+}

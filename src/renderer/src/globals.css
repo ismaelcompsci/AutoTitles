@@ -528,3 +528,91 @@ html {
   font-weight: 900;
   font-style: normal;
 }
+
+
+
+/* 
+#waveform ::part(region) {
+
+  background: transparent;
+  
+  border-radius: 6px;
+  border: 1px solid hsla(0, 0%, 100%, 0.14);
+  color: hsl(0 0% 63%);
+  overflow: hidden;
+
+} 
+
+#waveform ::part(cursor) {
+  background: var(--ds-gray-alpha-1000) ;
+}
+
+#waveform ::part(region active) {
+  background: var(--ds-gray-alpha-400);
+  color: hsl(0 0% 93%);;
+}
+
+#waveform ::part(region-content) {
+  margin-top: 0px;
+  font-size: 16px;
+  background: #0a0a0a;
+  width: 100%;
+  overflow: hidden;
+  line-clamp: 3; 
+  display: -webkit-box;
+  -webkit-line-clamp: 3; 
+  -webkit-box-orient: vertical;
+
+
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+} */
+
+
+
+#waveform ::part(scroll),
+#waveform>div {
+    height: 100%
+}
+
+#waveform ::part(region) {
+    border-color: hsl(var(--ds-border)) !important;
+    border: 1px solid;
+    border-radius: var(--radius);
+    cursor: default;
+    overflow: hidden;
+}
+
+#waveform ::part(region):active {
+    z-index: 50
+}
+
+#waveform ::part(region-content) {
+    left: 0;
+    margin-top: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+
+    text-align-last:left;
+    font-weight: 500;
+    border-radius: .125rem;
+    min-height: 30px;
+    height: fit-content;
+    background-color: hsl(var(--ds-background-100));
+    font-size: 13px;
+    line-height: 17px;
+    padding: 4px 8px .25rem;
+}
+
+#waveform ::part(region-handle) {
+}
+
+#waveform ::part(region-handle):active {
+}
+
+#waveform ::part(region-handle-left) {
+}
+
+#waveform ::part(region-handle-right) {
+}

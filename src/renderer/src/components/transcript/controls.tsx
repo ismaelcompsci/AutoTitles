@@ -2,36 +2,23 @@ import { secondsToTimestamp } from '@/lib/utils'
 import { MoreVertical, Pause, Play, Volume2, VolumeX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
-import { useAtom, useAtomValue } from 'jotai'
-import { currentTimeAtom, playingAtom } from '@/state/media-display-state'
-import { durationAtom, wavesurferAtom } from '@/state/whisper-model-state'
+import { useAtomValue } from 'jotai'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Slider } from '../common/slider'
+import { useWavesurfer } from '../common/wavesurfer-provider'
+import { currentTimeAtom, playingAtom } from '@/state/state'
+import { durationAtom } from '@/state/state'
 
 const TimeSlider = () => {
   const duration = useAtomValue(durationAtom)
-  const wavesurfer = useAtomValue(wavesurferAtom)
-  const [currentTime, setCurrentTime] = useAtom(currentTimeAtom)
-
-  useEffect(() => {
-    if (!wavesurfer) return
-
-    const subs = [
-      wavesurfer.on('timeupdate', (time: number) => {
-        setCurrentTime(Math.ceil(time * 100) / 100)
-      })
-    ]
-
-    return () => {
-      subs.forEach((s) => s())
-    }
-  }, [wavesurfer])
+  const currentTime = useAtomValue(currentTimeAtom)
+  const { ws } = useWavesurfer()
 
   return (
     <Slider
       className="flex-1"
       value={[(currentTime / duration) * 100]}
-      onValueChange={([v]) => wavesurfer?.seekTo((duration * (v / 100)) / duration)}
+      onValueChange={([v]) => ws?.seekTo((duration * (v / 100)) / duration)}
     />
   )
 }
@@ -50,12 +37,12 @@ const CurrentTimeDisplay = () => {
 
 const MediaPlayerPlayPauseButton = () => {
   const playing = useAtomValue(playingAtom)
-  const wavesurfer = useAtomValue(wavesurferAtom)
+  const { ws } = useWavesurfer()
 
   const playOrPause = () => {
-    if (!wavesurfer) return
+    if (!ws) return
 
-    wavesurfer.playPause()
+    ws.playPause()
   }
 
   if (playing) {
@@ -112,11 +99,11 @@ export const MediaPlayerControls = () => {
 
 export const VolumeSlider = () => {
   const [volume, setVolume] = useState(100)
-  const wavesurfer = useAtomValue(wavesurferAtom)
+  const { ws } = useWavesurfer()
 
   useEffect(() => {
-    if (!wavesurfer) return
-    wavesurfer.setVolume(volume / 100)
+    if (!ws) return
+    ws.setVolume(volume / 100)
   }, [volume])
 
   return (

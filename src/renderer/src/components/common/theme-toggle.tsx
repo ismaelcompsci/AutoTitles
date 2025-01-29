@@ -1,11 +1,11 @@
 import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
-import { useTheme } from '../providers'
+import { useTheme } from './providers'
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme()
 
   return (
-    <div className="flex w-fit rounded-full bg-background-100 shadow-border [app-region:no-drag;]">
+    <div className="flex w-fit rounded-full bg-background-100 shadow-border drag-none">
       <span className="h-full">
         <input
           className="peer sr-only"

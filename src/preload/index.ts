@@ -11,8 +11,12 @@ const api: IAPI = {
   encodeForWhisper: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE, args),
   encodeAudioForBrowser: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE_AUDIO, args),
   getDownloadsFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER),
-  chooseFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER),
+  showOpenDialog: (args) => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, args),
   exportSubtitles: (args) => ipcRenderer.invoke(IPCCHANNELS.EXPORT_SUBTITLES, args),
+  createJob: (args) => ipcRenderer.invoke(IPCCHANNELS.CREATE_JOB, args),
+  getJobList: (args) => ipcRenderer.invoke(IPCCHANNELS.GET_JOBLIST, args),
+  getTranscribeOptions: () => ipcRenderer.invoke('queue.getTranscribeOptions'),
+  queuePendingJobs: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_PENDING_JOBS),
 
   // main -> renderer
   onDownloadStarted: (callback) =>
@@ -20,7 +24,10 @@ const api: IAPI = {
   onDownloadProgress: (callback) =>
     ipcRenderer.on('download-progress', (_event, value) => callback(value)),
   onDownloadCompleted: (callback) =>
-    ipcRenderer.on('download-completed', (_event, value) => callback(value))
+    ipcRenderer.on('download-completed', (_event, value) => callback(value)),
+
+  onSubtitleAdded: (callback) =>
+    ipcRenderer.on('segments:segment-added', (_event, value) => callback(value))
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

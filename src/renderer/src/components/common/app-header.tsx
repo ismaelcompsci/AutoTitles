@@ -1,14 +1,6 @@
-import { Step } from '@/hooks/use-transcription'
-import { currentTaskAtom, fileInputAtom } from '@/state/whisper-model-state'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { selectAtom } from 'jotai/utils'
-import { ArrowRight, MoveLeft, MoveRight, Plus } from 'lucide-react'
-import { Gauge } from '@/components/ui/gauge'
+import { ArrowRight, MoveLeft, MoveRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { stepAtom } from '@/state/main-state'
-import { MenuContainer, MenuButton, MenuItem, Menu } from '@/components/ui/dropdown'
 import { Modal } from '@/components/ui/modal'
 import { ConfigSection } from './config-section'
 import { ConfigItem } from './config-item'
@@ -25,35 +17,19 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import path from 'path'
 
-const taskStepAtom = selectAtom(currentTaskAtom, (task) => task?.step)
 export const AppHeader = () => {
-  const setFileInput = useSetAtom(fileInputAtom)
-  const setCurrentTask = useSetAtom(currentTaskAtom)
-  const setCurrentStep = useSetAtom(stepAtom)
-  const file = useAtomValue(fileInputAtom)
-  const step = useAtomValue(taskStepAtom)
-  // force update on nav
-  const nav = useNavigate()
-  const location = useLocation()
-
-  const hasHistory = window.history.state.idx !== 0
-
   const handleButton = () => {
-    if (location.pathname === '/' || location.pathname === '/home') {
-    } else {
-      nav('/home')
-    }
-
-    setFileInput(null)
-    setCurrentStep('INPUT')
-    setCurrentTask(null)
+    // if (location.pathname === '/' || location.pathname === '/home') {
+    // } else {
+    //   nav('/home')
+    // }
 
     console.log(location)
     console.log('handleButton')
   }
 
   return (
-    <div className="header h-10 flex items-center gap-8 shrink-0 bg-background [app-region:drag;]">
+    <div className="header bg-background-200 h-10 flex items-center gap-8 shrink-0 drag">
       <div
         style={{
           paddingLeft: '81px'
@@ -66,8 +42,8 @@ export const AppHeader = () => {
           onClick={() => {
             window.history.back()
           }}
-          disabled={!hasHistory}
-          className="px-0 text-muted-foreground disabled:text-muted [app-region:no-drag;] disabled:bg-background-100 disabled:border-none"
+          disabled={true}
+          className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
           size={'tiny'}
           shape="square"
           variant={'tertiary'}
@@ -76,9 +52,10 @@ export const AppHeader = () => {
         </Button>
 
         <Button
-          className="px-0 text-muted-foreground disabled:text-muted [app-region:no-drag;] disabled:bg-background-100 disabled:border-none"
+          className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
           size={'tiny'}
           shape="square"
+          disabled={true}
           variant={'tertiary'}
           onClick={() => {
             window.history.forward()
@@ -87,16 +64,16 @@ export const AppHeader = () => {
           <MoveRight className="h-4 w-4 text-muted" />
         </Button>
       </div>
-      <div className="flex items-center gap-2 min-w-0 w-full">
+      {/* <div className="flex items-center gap-2 min-w-0 w-full">
         <div className="flex flex-shrink gap-2 w-full">
           <div className=" w-full flex justify-center items-center">
-            <span className="[app-region:no-drag;] cursor-default">{file?.name}</span>
+            <span className="[app-region:no-drag;] cursor-default">{'namel'}</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex-1 flex flex-row items-center gap-2 mr-4">
-        {step && step !== 'DONE' ? (
+        {/* {step && step !== 'DONE' ? (
           <Gauge size="tiny" value={calcPercentForStep(step)} />
         ) : (
           <MenuContainer>
@@ -118,25 +95,10 @@ export const AppHeader = () => {
           </MenuContainer>
         )}
 
-        {step === 'DONE' && <ExportDialog />}
+        {step === 'DONE' && <ExportDialog />} */}
       </div>
     </div>
   )
-}
-
-const calcPercentForStep = (step: Step) => {
-  switch (step) {
-    case 'IDLE':
-      return 0
-    case 'AUDIO':
-      return 25
-    case 'TRANSCRIBING':
-      return 50
-    case 'DONE':
-      return 100
-    default:
-      return 0
-  }
 }
 
 const ExportOptions = [
@@ -148,22 +110,22 @@ const ExportOptions = [
 
 const downloadsFolder = await window.api.getDownloadsFolder()
 
-const subtitlesAtom = selectAtom(currentTaskAtom, (task) => task?.response)
 export const ExportDialog = () => {
   const [format, setFormat] = useState<string>()
-  const [folder, setFolder] = useState<string>(downloadsFolder)
-  const subtitles = useAtomValue(subtitlesAtom)
+  const [folder] = useState<string>(downloadsFolder)
+  // const subtitles = useAtomValue(subtitlesAtom)
 
   const handleClick = async () => {
-    const folder = await window.api.chooseFolder()
-
-    if (folder) {
-      setFolder(folder)
-    }
+    // TODOD
+    // const folder = await window.api.chooseFolder
+    // if (folder) {
+    //   setFolder(folder)
+    // }
   }
 
   const handleExport = async () => {
-    if (!subtitles) {
+    // TODOD
+    if (false) {
       toast.error('No subtitles')
       return
     }
@@ -174,7 +136,7 @@ export const ExportDialog = () => {
     try {
       await window.api.exportSubtitles({
         filepath,
-        data: subtitles,
+        data: [],
         type: format || 'srt'
       })
 
@@ -188,11 +150,7 @@ export const ExportDialog = () => {
   return (
     <Modal.Modal>
       <Modal.Trigger asChild>
-        <Button
-          size={'tiny'}
-          className="[app-region:no-drag;]"
-          prefix={<ArrowRight className="h-4 w-4" />}
-        >
+        <Button size={'tiny'} className="drag-none" prefix={<ArrowRight className="h-4 w-4" />}>
           Export
         </Button>
       </Modal.Trigger>

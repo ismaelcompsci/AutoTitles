@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: ["class"],
@@ -341,6 +343,17 @@ module.exports = {
     },
     plugins: [
       require("tailwindcss-animate"),
+	  plugin(function({ addUtilities }) {
+		addUtilities({
+		  '.drag': {
+			'app-region': 'drag'
+		  },
+
+		  '.drag-none': {
+			'app-region': 'no-drag'
+		  }
+		})
+	  })
     ],
 }
 

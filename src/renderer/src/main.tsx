@@ -1,11 +1,18 @@
-// import { scan } from 'react-scan' // import this BEFORE react
+import { scan } from 'react-scan' // import this BEFORE react
 import './globals.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { createStore, Provider } from 'jotai'
+import { Provider } from 'jotai'
+import { store } from './state/store'
 
-const store = createStore()
+// if (typeof window !== 'undefined') {
+//   scan({
+//     enabled: true,
+//     log: true // logs render info to console (default: false)
+//   })
+// }
+
 const Root = () => {
   return (
     <Provider store={store}>

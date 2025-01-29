@@ -35,7 +35,7 @@ export async function transcribe(
   return result
 }
 
-function read_wav(file: string): Float32Array {
+export function read_wav(file: string): Float32Array {
   const { sampleRate, channelData } = decode(fs.readFileSync(file))
 
   if (sampleRate !== 16000) {

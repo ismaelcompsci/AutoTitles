@@ -11,5 +11,8 @@
     "types": [
       "electron-vite/node"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
