@@ -3,6 +3,10 @@ import { VideoPlayer } from '../transcript/video-player'
 import { SubtitleList } from '../transcript/subtitle-list'
 import { Waveform } from '../transcript/waveform'
 import { ResizablePanel } from '../common/resizeable-panel'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { pageAtom, transcribeJobListAtom } from '@/state/state'
+import { Button } from '../ui/button'
+import { ArrowRight } from 'lucide-react'
 
 export const TranscriptView = () => {
   return (
@@ -30,10 +34,39 @@ export const BottomPanel = () => {
 export const TopPanel = () => {
   return (
     <div className="relative flex size-full flex-col text-sm">
+      <TranscriptHeader />
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <VideoPlayer />
 
         <SubtitleList />
+      </div>
+    </div>
+  )
+}
+
+const TranscriptHeader = () => {
+  const setPage = useSetAtom(pageAtom)
+  const transcribeJobList = useAtomValue(transcribeJobListAtom)
+  const job = transcribeJobList[0]
+
+  const handleStartExport = async () => {
+    await window.api.createJob({ type: 'Export', data: { filePath: job.filePath } })
+    setPage('export')
+  }
+
+  return (
+    <div className="relative min-h-9 px-4 text-gray-900 drag-none border-b-[0.5px] justify-center gap-3 max-w-full flex items-center text-xs font-medium ">
+      <span>{job.fileName}</span>
+
+      <div className="absolute inset-y-0 right-0 flex items-center px-2">
+        <Button
+          size={'tiny'}
+          variant={'secondary'}
+          suffix={<ArrowRight className="w-4 h-4 mr-1 " />}
+          onClick={handleStartExport}
+        >
+          Export
+        </Button>
       </div>
     </div>
   )

@@ -5,8 +5,6 @@ import { TranscriptView } from './transcript-view'
 import { pageAtom } from '@/state/state'
 import { mainContainerRefAtom } from '@/state/state'
 import { ExportView } from './export-view'
-import { Button } from '../ui/button'
-import { MoveRight } from 'lucide-react'
 
 export const MainView = () => {
   const setMainContainerRef = useSetAtom(mainContainerRefAtom)
@@ -51,23 +49,29 @@ export const MainView = () => {
         ref={setMainContainerRef}
         className="relative size-full bg-background-100 overflow-hidden md:rounded-sm border-[0.5px] rounded-none"
       >
-        <header className="drag px-4 min-h-9 border-b-[0.5px] gap-3 max-w-full flex items-center text-xs font-medium">
-          <div>{title}</div>
-
-          <div className="flex flex-1" />
-
-          <Button
-            size={'tiny'}
-            variant={'secondary'}
-            className="text-xs drag-none px-3"
-            suffix={<MoveRight className="w-4 h-4" />}
-          >
-            Start
-          </Button>
-        </header>
+        <View />
+        {/* 
         <div className="size-full">
-          <View />
-        </div>
+
+          <header className="drag px-4 min-h-9 border-b-[0.5px] gap-3 max-w-full flex items-center text-xs font-medium">
+            <div>{title}</div>
+
+            <div className="flex flex-1" />
+
+            <Button
+              size={'tiny'}
+              variant={'secondary'}
+              className="text-xs drag-none px-3"
+              suffix={<MoveRight className="w-4 h-4" />}
+            >
+              Start
+            </Button>
+          </header>
+
+          <div className="size-full">
+            <View />
+          </div>
+        </div> */}
       </div>
     </div>
   )

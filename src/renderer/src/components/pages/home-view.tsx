@@ -3,15 +3,13 @@ import { Button } from '../ui/button'
 import { supportedFormats } from '@/lib/utils'
 import { useSetAtom } from 'jotai'
 import { pageAtom, transcribeJobListAtom } from '@/state/state'
-import { PageViewContainer } from '../common/page-view-container'
+import { Page } from '../ui/page'
 
 export const HomeView = () => {
   const setPage = useSetAtom(pageAtom)
   const setTranscribeJobList = useSetAtom(transcribeJobListAtom)
 
   const handleClick = async () => {
-    // open file dialog
-
     const { filePaths } = await window.api.showOpenDialog({
       message: 'Select and Audio or Video file to transcribe',
       properties: ['openFile', 'createDirectory'],
@@ -33,8 +31,9 @@ export const HomeView = () => {
   }
 
   return (
-    <PageViewContainer>
-      <div className="flex flex-col justify-center items-center text-foreground flex-1">
+    <Page.Root>
+      <Page.Header>New Transcript</Page.Header>
+      <Page.Body className="flex flex-col justify-center items-center text-foreground flex-1">
         <AudioLines className="h-28 w-28 text-muted-foreground" />
 
         <div className="flex gap-2 items-center flex-col">
@@ -53,7 +52,7 @@ export const HomeView = () => {
             Upload
           </Button>
         </div>
-      </div>
-    </PageViewContainer>
+      </Page.Body>
+    </Page.Root>
   )
 }

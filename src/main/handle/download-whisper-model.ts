@@ -3,26 +3,12 @@ import { downloadManager } from '../index'
 import fs from 'fs'
 import { BrowserWindow } from 'electron'
 import os from 'node:os'
+import { MODELS } from '../../shared/constants'
 
 const root = path.join(os.homedir(), '.autotitles')
 const models = path.join(root, 'models')
 
 fs.mkdirSync(models, { recursive: true })
-
-export const MODELS = [
-  'tiny',
-  'tiny.en',
-  'base',
-  'base.en',
-  'small',
-  'small.en',
-  'medium',
-  'medium.en',
-  'large-v1',
-  'large-v2',
-  'large-v3',
-  'large-v3-turbo'
-] as const
 
 export type WhisperModel = (typeof models)[number]
 

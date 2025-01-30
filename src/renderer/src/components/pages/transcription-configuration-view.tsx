@@ -21,7 +21,8 @@ import {
   transcribeJobListAtom,
   transcribeOptionsAtom
 } from '@/state/state'
-import { PageViewContainer } from '../common/page-view-container'
+import { Page } from '../ui/page'
+import { useEffect } from 'react'
 
 export const TranscriptionConfigurationView = () => {
   const setShowDownloadModalDialog = useSetAtom(showDownloadModalDialogAtom)
@@ -45,92 +46,116 @@ export const TranscriptionConfigurationView = () => {
     }
   }
 
-  const handleSelectModelChange = (value: string) => {
-    setTranscribeOptions((p) => ({ ...p, model: value }))
+  const handleValueChange = async (key: string, value: any) => {
+    await window.api.updateTranscribeOptions({ key, value })
   }
 
-  const handleMaxCharPerSegmentInputChange = (value: number) => {
-    setTranscribeOptions((p) => ({ ...p, maxLen: value }))
+  const getTranscribeOptions = async () => {
+    const options = await window.api.getTranscribeOptions()
+    setTranscribeOptions(options)
   }
+
+  const getPathForModel = (model: string) => {
+    return downloadedModels.filter((m) => m.name === model)[0].path
+  }
+
+  useEffect(() => {
+    getTranscribeOptions()
+  }, [])
 
   return (
-    <PageViewContainer>
-      <div className="h-8" />
+    <Page.Root>
+      <Page.Header>
+        <span>Transcript Configuration</span>
 
-      <div className="flex flex-col gap-12">
-        <ConfigSection title="General">
-          <ConfigItem label="Model" divider>
-            <div className="grow" />
-            <Select
-              disabled={downloadedModels.length === 0}
-              value={transcribeOptions?.model}
-              onValueChange={handleSelectModelChange}
-            >
-              <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent className="bg-background">
-                <SelectGroup>
-                  <SelectLabel className="text-[10px] text-muted-foreground">
-                    Installed Models
-                  </SelectLabel>
-                  {downloadedModels.map((model) => {
-                    return (
-                      <SelectItem key={`${model.name}`} value={model.name}>
-                        {model.name}
-                      </SelectItem>
-                    )
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+        <div className="flex-1" />
+        <Button
+          className="px-2 drag-none"
+          variant={'secondary'}
+          size={'tiny'}
+          suffix={<MoveRight className="h-4 w-4" />}
+          onClick={handleStartTranscription}
+        >
+          Start
+        </Button>
+      </Page.Header>
+      <Page.Body className="flex flex-col">
+        <div className="h-8" />
 
-            <Button
-              size={'tiny'}
-              variant={'secondary'}
-              className="text-[10px] text-muted-foreground"
-              onClick={() => setShowDownloadModalDialog(true)}
-            >
-              Download models...
-            </Button>
-          </ConfigItem>
+        <div className="flex flex-col gap-12">
+          <ConfigSection title="General">
+            <ConfigItem label="Model" divider>
+              <div className="grow" />
+              <Select
+                defaultValue={transcribeOptions?.model}
+                disabled={downloadedModels.length === 0}
+                onValueChange={(value) => handleValueChange('model', getPathForModel(value))}
+              >
+                <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent className="bg-background">
+                  <SelectGroup>
+                    <SelectLabel className="text-[10px] text-muted-foreground">
+                      Installed Models
+                    </SelectLabel>
+                    {downloadedModels.map((model) => {
+                      return (
+                        <SelectItem key={`${model.name}`} value={model.name}>
+                          {model.name}
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
-          <ConfigItem label="Limit Characters per Segments/Line">
-            <div className="grow" />
-            <NumberInput
-              // @ts-ignore
-              value={isNaN(transcribeOptions?.maxLen) ? 'Auto' : transcribeOptions.maxLen}
-              onChange={handleMaxCharPerSegmentInputChange}
-            />
-          </ConfigItem>
-        </ConfigSection>
+              <Button
+                size={'tiny'}
+                variant={'secondary'}
+                className="text-[10px] text-muted-foreground"
+                onClick={() => setShowDownloadModalDialog(true)}
+              >
+                Download models...
+              </Button>
+            </ConfigItem>
 
-        <ConfigSection title="Info">
-          <ConfigItem label="" className="text-sm text-muted-foreground">
-            <div className="flex flex-row grow gap-4 items-center">
-              <FileVolume className="h-4 w-4" />
-              <span className="line-clamp-1 pr-4 text-balance">{job?.fileName}</span>
-            </div>
+            <ConfigItem label="Limit Characters per Segments/Line">
+              <div className="grow" />
+              <NumberInput
+                value={transcribeOptions.maxLen}
+                onChange={(value) => handleValueChange('maxLen', value)}
+              />
+            </ConfigItem>
+          </ConfigSection>
 
-            <div className="grow" />
-            {/* {videoTime ? (
+          <ConfigSection title="Info">
+            <ConfigItem label="" className="text-sm text-muted-foreground">
+              <div className="flex flex-row grow gap-4 items-center">
+                <FileVolume className="h-4 w-4" />
+                <span className="line-clamp-1 pr-4 text-balance">{job?.fileName}</span>
+              </div>
+
+              <div className="grow" />
+              {/* {videoTime ? (
               <div className="font-gesit-mono">{videoTime}</div>
             ) : (
               <Loader2 className="h-2 w-2 animate-spin" />
             )} */}
-          </ConfigItem>
-        </ConfigSection>
-      </div>
+            </ConfigItem>
+          </ConfigSection>
+        </div>
 
-      <Button
-        size={'lg'}
-        onClick={handleStartTranscription}
-        className="mt-12 max-w-42 self-end flex"
-        loading={false}
-        suffix={<MoveRight className="h-4 w-4" />}
-      >
-        Start Transcription
-      </Button>
-    </PageViewContainer>
+        <Button
+          size={'lg'}
+          onClick={handleStartTranscription}
+          className="mt-12 max-w-42 self-end flex"
+          loading={false}
+          suffix={<MoveRight className="h-4 w-4" />}
+        >
+          Start Transcription
+        </Button>
+      </Page.Body>
+    </Page.Root>
   )
 }

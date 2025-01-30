@@ -1,68 +1,20 @@
-import { Whisper } from 'smart-whisper'
 import EmbeddedQueue, { CreateJobData, Job } from 'embedded-queue'
 import { v4 as uuid } from 'uuid'
-import { read_wav } from '../handle/transcribe'
 import path from 'path'
-import { QueueJob } from '../../shared/models'
+import { ExportConfig, QueueJob, WhisperInputConfig } from '../../shared/models'
 import { ExportJobData, TranscribeJobData } from '../../shared/models'
 import { JobType } from '../../shared/models'
 import { JobDataForType } from '../../shared/models'
-import { whisperInputConfig } from '../whisper-config'
-import { BrowserWindow } from 'electron'
-import { encodeForWhisper } from '../handle/encode-for-whisper'
-import os from 'node:os'
 
-const root = path.join(os.homedir(), '.autotitles')
-const models = path.join(root, 'models')
-
-const filename = `ggml-tiny.en.bin`
-const modelPath = path.join(models, filename)
-
-const handleTranscribeJob = async (job: Job): Promise<void> => {
-  console.log('[handleTranscribeJob]', job.id, job.data)
-
-  const { data } = job as QueueJob
-  const { filePath } = data as TranscribeJobData
-
-  // @ts-ignore
-  const encodedFilePath = await encodeForWhisper(null, filePath)
-
-  const whisper = new Whisper(modelPath, { gpu: true })
-  const pcm = read_wav(encodedFilePath)
-
-  const task = await whisper.transcribe(pcm, {
-    suppress_non_speech_tokens: true,
-    ...whisperInputConfig
-  })
-
-  task.on('transcribed', (subtitle) => {
-    const id = `id-${subtitle.from}-${subtitle.to}`
-    console.log({ id, ...subtitle })
-
-    const window = BrowserWindow.getFocusedWindow()
-
-    window?.webContents.send('segments:segment-added', {
-      id,
-      start: subtitle.from,
-      end: subtitle.to,
-      text: subtitle.text
-    })
-  })
-
-  const result = await task.result
-
-  console.log(result[0])
-  await whisper.free()
-}
-
-const handleExportJob = async (job: Job): Promise<void> => {
-  console.log(job.id, job.data)
-}
+import { handleExportJob } from './jobs'
+import { handleTranscribeJob } from './jobs'
 
 export class QueueManager {
   private static instance: QueueManager
   private queue?: EmbeddedQueue.Queue
   private pendingJobs: Job[] = []
+  private whisperConfig: WhisperInputConfig = baseWhisperInputConfig
+  private exportConfig: ExportConfig = baseExportConfig
 
   static getInstance(): QueueManager {
     if (!QueueManager.instance) {
@@ -123,15 +75,18 @@ export class QueueManager {
   }
 
   getTranscribeOptions() {
-    return whisperInputConfig
+    return this.whisperConfig
   }
 
-  // move these away from queuemanagaer
-  createExportJob = async (_data) => {
-    // todop
+  updateTranscribeOption(key: string, value: string) {
+    console.log(key, ': ', value)
+    this.whisperConfig[key] = value
   }
 
-  createTranscribeJob = async ({ filePath }: { filePath: string }) => {
+  createExportJob = async (_data: ExportJobData) => {}
+
+  createTranscribeJob = async (data: TranscribeJobData) => {
+    const { filePath } = data
     const basename = path.basename(filePath)
 
     const createNewJobData: CreateJobData = {
@@ -154,4 +109,23 @@ export class QueueManager {
 
     this.pendingJobs.push(job)
   }
+}
+
+export const baseWhisperInputConfig: WhisperInputConfig = {
+  model: '',
+  useGpu: false,
+  maxLen: 0,
+  splitOnWord: false,
+  language: 'en',
+  nThreads: 4,
+  beamSize: 1,
+  temperatureInc: 0.2,
+  entropyThold: 2.4,
+  prompt: '',
+  maxContext: 0
+}
+
+export const baseExportConfig: ExportConfig = {
+  format: '',
+  folder: ''
 }

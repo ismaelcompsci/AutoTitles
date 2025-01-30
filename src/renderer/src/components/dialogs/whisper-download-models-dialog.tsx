@@ -1,13 +1,13 @@
 import { Modal } from '@/components/ui/modal'
-import { downloadedModelsAtom, showDownloadModalDialogAtom } from '@/state/whisper-model-state'
 import { Button } from '../ui/button'
-import { models, modelSizes, WhisperModel } from '@/util/models'
 import { Separator } from '../ui/separator'
 import { Download, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Gauge } from '../ui/gauge'
 import { useAtom } from 'jotai'
 import { toast } from 'sonner'
+import { downloadedModelsAtom, showDownloadModalDialogAtom } from '@/state/state'
+import { MODELS, modelSizes, WhisperModel } from 'src/shared/constants'
 
 export const WhisperDownloadModelsDialog = () => {
   const [showDownloadModalDialog, setShowDownloadModalDialog] = useAtom(showDownloadModalDialogAtom)
@@ -88,7 +88,7 @@ export const WhisperDownloadModelsDialog = () => {
 
   const filteredModels = useMemo(() => {
     const names = downloadedModels.map((dm) => dm.name)
-    return models.filter((model) => !names.includes(model))
+    return MODELS.filter((model) => !names.includes(model))
   }, [downloadedModels])
 
   const percentage = (download.bytesReceived / download.totalBytes) * 100
@@ -145,7 +145,7 @@ export const WhisperDownloadModelsDialog = () => {
                       )}
                     </div>
 
-                    {i !== models.length - 1 && <Separator />}
+                    {i !== MODELS.length - 1 && <Separator />}
                   </div>
                 )
               })}

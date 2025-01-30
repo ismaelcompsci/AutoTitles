@@ -26,7 +26,8 @@ export interface TranscribeJobData {
 }
 
 export interface ExportJobData {
-  exportPath: string
+  exportPath?: string
+  filePath?: string
 }
 
 // Define the job types
@@ -54,14 +55,20 @@ export type JobDataForType<T extends JobType> = T extends 'Transcribe'
 export type TranscribeListSerialized = TranscribeJobData & {
   id: string
 }
+export type ExportListSerialized = ExportJobData & {
+  id: string
+}
 
 export type SerializedJobForType<T extends JobType> = T extends 'Transcribe'
   ? TranscribeListSerialized
   : T extends 'Export'
-    ? ExportJobData
+    ? ExportListSerialized
     : never
 
 export type WhisperInputConfig = {
+  /**
+   * path to model
+   */
   model: string
   language: string
   maxLen: number
@@ -73,6 +80,11 @@ export type WhisperInputConfig = {
   temperatureInc: number
   entropyThold: number
   prompt: string
+}
+
+export type ExportConfig = {
+  folder: string
+  format: string
 }
 
 export type Subtitle = {

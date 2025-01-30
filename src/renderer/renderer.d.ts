@@ -40,6 +40,7 @@ interface QueueMangaerAPI {
   createJob: <T extends JobType>(args: { type: T; data: JobDataForType<T> }) => Promise<void>
   getJobList: <T extends JobType>(args: { type: T }) => Promise<SerializedJobForType<T>[]>
   getTranscribeOptions: () => Promise<WhisperInputConfig>
+  updateTranscribeOptions: (args: { key: string; value: string }) => Promise<void>
   queuePendingJobs: () => Promise<void>
 
   onSubtitleAdded: (callback: (value: Subtitle) => void) => Electron.IpcRenderer

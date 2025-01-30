@@ -6,15 +6,12 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { downloadWhisperModel } from './handle/download-whisper-model'
 import { ElectronDownloadManager } from 'electron-dl-manager'
-import { probe } from './handle/ffmpeg'
-import { transcribe } from './handle/transcribe'
-import { encodeForWhisper } from './handle/encode-for-whisper'
 import { encodeAudioForBrowser } from './handle/encode-for-browser'
 import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder, showOpenDialog } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 import { exportSubtitles } from './handle/export-subtitles'
 import { QueueManager } from './queue/queue-manager'
-import { JobType, TranscribeJobData } from '../shared/models'
+import { ExportJobData, JobType, TranscribeJobData } from '../shared/models'
 import { JobDataForType } from '../shared/models'
 
 const appIcon = nativeImage.createFromPath(icon)
@@ -75,9 +72,6 @@ app.whenReady().then(async () => {
   })
 
   ipcMain.handle(IPCCHANNELS.DOWNLOAD_WHISPER_MODEL, downloadWhisperModel)
-  ipcMain.handle(IPCCHANNELS.PROBE, probe)
-  ipcMain.handle(IPCCHANNELS.WHISPER_TRANSCRIBE, transcribe)
-  ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE, encodeForWhisper)
   ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
@@ -113,10 +107,15 @@ setupQueueHandlers()
 
 // Move IPC handlers to a separate file
 async function setupQueueHandlers() {
-  await QueueManager.getInstance().init()
+  const queue = QueueManager.getInstance()
+  await queue.init()
 
-  ipcMain.handle('queue.getTranscribeOptions', (_event) => {
+  ipcMain.handle(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS, (_event) => {
     return QueueManager.getInstance().getTranscribeOptions()
+  })
+
+  ipcMain.handle(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, (_event, { key, value }) => {
+    return QueueManager.getInstance().updateTranscribeOption(key, value)
   })
 
   ipcMain.handle(
@@ -136,7 +135,7 @@ async function setupQueueHandlers() {
 
     return jobs.map((job) => {
       switch (type) {
-        case 'Transcribe':
+        case 'Transcribe': {
           const data = job.data as TranscribeJobData
 
           return {
@@ -145,11 +144,15 @@ async function setupQueueHandlers() {
             duration: data.duration,
             filePath: data.filePath
           }
+        }
+        case 'Export': {
+          const data = job.data as ExportJobData
 
-        case 'Export':
           return {
-            id: job.id
+            id: job.id,
+            filePath: data.filePath
           }
+        }
         default:
           throw new Error(`Unsupported job type: ${type}`)
       }

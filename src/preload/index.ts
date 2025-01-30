@@ -15,7 +15,8 @@ const api: IAPI = {
   exportSubtitles: (args) => ipcRenderer.invoke(IPCCHANNELS.EXPORT_SUBTITLES, args),
   createJob: (args) => ipcRenderer.invoke(IPCCHANNELS.CREATE_JOB, args),
   getJobList: (args) => ipcRenderer.invoke(IPCCHANNELS.GET_JOBLIST, args),
-  getTranscribeOptions: () => ipcRenderer.invoke('queue.getTranscribeOptions'),
+  getTranscribeOptions: () => ipcRenderer.invoke(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS),
+  updateTranscribeOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, args),
   queuePendingJobs: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_PENDING_JOBS),
 
   // main -> renderer

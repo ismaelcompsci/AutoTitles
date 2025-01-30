@@ -15,10 +15,12 @@ export const IPCCHANNELS = {
 
   CREATE_JOB: 'queue.createJob',
   GET_JOBLIST: 'queue.getJobList',
-  QUEUE_PENDING_JOBS: 'queue.queuePendingJobs'
+  QUEUE_PENDING_JOBS: 'queue.queuePendingJobs',
+  GET_TRANSCRIBE_OPTIONS: 'queue.getTranscribeOptions',
+  UPDATE_TRANSCRIBE_OPTION: 'queue.updateTranscribeOption'
 } as const
 
-export const models = [
+export const MODELS = [
   'tiny',
   'tiny.en',
   'base',
@@ -48,4 +50,4 @@ export const modelSizes: { [key in WhisperModel]: string } = {
   'large-v3-turbo': '1.62 GB'
 }
 
-export type WhisperModel = (typeof models)[number]
+export type WhisperModel = (typeof MODELS)[number]

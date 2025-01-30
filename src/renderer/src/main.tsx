@@ -1,4 +1,4 @@
-import { scan } from 'react-scan' // import this BEFORE react
+// import { scan } from 'react-scan' // import this BEFORE react
 import './globals.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
