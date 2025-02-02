@@ -1,20 +1,20 @@
 import EmbeddedQueue, { CreateJobData, Job } from 'embedded-queue'
 import { v4 as uuid } from 'uuid'
 import path from 'path'
-import { ExportConfig, QueueJob, WhisperInputConfig } from '../../shared/models'
+import { QueueJob, WhisperInputConfig } from '../../shared/models'
 import { ExportJobData, TranscribeJobData } from '../../shared/models'
 import { JobType } from '../../shared/models'
 import { JobDataForType } from '../../shared/models'
 
 import { handleExportJob } from './jobs'
 import { handleTranscribeJob } from './jobs'
+import '../db'
+import { db } from '../db'
 
 export class QueueManager {
   private static instance: QueueManager
   private queue?: EmbeddedQueue.Queue
   private pendingJobs: Job[] = []
-  private whisperConfig: WhisperInputConfig = baseWhisperInputConfig
-  private exportConfig: ExportConfig = baseExportConfig
 
   static getInstance(): QueueManager {
     if (!QueueManager.instance) {
@@ -41,7 +41,6 @@ export class QueueManager {
   }
 
   getJobList = (type: string) => {
-    console.log('[QueueManager.getJobList] type: ', type)
     return this.pendingJobs?.filter((job) => job.type === type) as QueueJob[]
   }
 
@@ -57,7 +56,6 @@ export class QueueManager {
 
   createJob = async <T extends JobType>(type: T, data: JobDataForType<T>): Promise<void> => {
     try {
-      console.log(type, data)
       switch (type) {
         case 'Transcribe':
           await this.createTranscribeJob(data as TranscribeJobData)
@@ -75,12 +73,19 @@ export class QueueManager {
   }
 
   getTranscribeOptions() {
-    return this.whisperConfig
+    return db.prepare('SELECT * FROM whisperconfig LIMIT 1').get() as WhisperInputConfig
   }
 
-  updateTranscribeOption(key: string, value: string) {
-    console.log(key, ': ', value)
-    this.whisperConfig[key] = value
+  updateTranscribeOption(key: string, value: any) {
+    console.log(`[UPDATE] ${key}: ${value}`)
+    const stmt = db.prepare(`UPDATE whisperconfig SET ${key} = ? WHERE id = 1`)
+
+    // Convert boolean values to integers for SQLite storage
+    if (typeof value === 'boolean') {
+      value = value ? 1 : 0
+    }
+
+    stmt.run(value)
   }
 
   createExportJob = async (_data: ExportJobData) => {}
@@ -109,23 +114,4 @@ export class QueueManager {
 
     this.pendingJobs.push(job)
   }
-}
-
-export const baseWhisperInputConfig: WhisperInputConfig = {
-  model: '',
-  useGpu: false,
-  maxLen: 0,
-  splitOnWord: false,
-  language: 'en',
-  nThreads: 4,
-  beamSize: 1,
-  temperatureInc: 0.2,
-  entropyThold: 2.4,
-  prompt: '',
-  maxContext: 0
-}
-
-export const baseExportConfig: ExportConfig = {
-  format: '',
-  folder: ''
 }

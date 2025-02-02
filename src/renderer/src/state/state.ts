@@ -1,5 +1,4 @@
 import { atom } from 'jotai'
-import { atomWithStorage } from 'jotai/utils'
 import {
   ExportListSerialized,
   Subtitle,
@@ -8,7 +7,7 @@ import {
 } from 'src/shared/models'
 import type Regions from 'wavesurfer.js/dist/plugins/regions'
 
-export type Page = 'home' | 'transcript-config' | 'transcript' | 'export'
+export type Page = 'home' | 'transcript-config' | 'transcript' | 'export' | 'model-manager'
 export const pageAtom = atom<Page>('home')
 export const mainContainerRefAtom = atom<HTMLDivElement | null>(null)
 
@@ -27,9 +26,4 @@ export const activeRegionIdAtom = atom<string | null>(null)
 // * whisper input
 export const transcribeOptionsAtom = atom<WhisperInputConfig>({} as WhisperInputConfig)
 export const audioURLAtom = atom<string | null>(null)
-
-export const downloadedModelsAtom = atomWithStorage<{ name: string; path: string }[]>(
-  'downloaded-models-key',
-  []
-)
-export const showDownloadModalDialogAtom = atom(false)
+// export const showDownloadModalDialogAtom = atom(false)

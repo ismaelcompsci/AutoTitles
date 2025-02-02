@@ -1,3 +1,4 @@
+import type { DownloadConfig } from 'electron-dl-manager'
 import type { Job } from 'embedded-queue'
 
 export interface WhisperParams {
@@ -67,7 +68,7 @@ export type SerializedJobForType<T extends JobType> = T extends 'Transcribe'
 
 export type WhisperInputConfig = {
   /**
-   * path to model
+   * model id
    */
   model: string
   language: string
@@ -92,4 +93,33 @@ export type Subtitle = {
   start: number
   end: number
   text: string
+}
+
+export type Model = { name: string; path: string }
+
+export type DownloadParams = Pick<DownloadConfig, 'directory' | 'url' | 'saveAsFilename'>
+
+export type DownloadEvent = {
+  id: string
+  filename: string
+  totalBytes: number
+  progress: number
+  url: string
+  receivedBytes: number
+  error?: string
+}
+
+export type ModelItem = {
+  id: string
+  label: string
+  url: string
+  description: string
+  disabled: boolean
+  size: string
+  type: string
+}
+
+export type ModelCategory = {
+  id: string
+  items: ModelItem[]
 }

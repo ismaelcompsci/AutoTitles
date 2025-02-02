@@ -17,8 +17,6 @@ const filename = `ggml-tiny.en.bin`
 const modelPath = path.join(models, filename)
 
 export const handleTranscribeJob = async (job: Job): Promise<void> => {
-  console.log('[handleTranscribeJob]', job.id, job.data)
-
   const { data } = job as QueueJob
   const { filePath } = data as TranscribeJobData
 

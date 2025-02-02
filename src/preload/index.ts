@@ -5,30 +5,85 @@ import { IPCCHANNELS } from '../shared/constants'
 
 const api: IAPI = {
   // main <-> renderer
-  downloadWhisperModel: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_WHISPER_MODEL, args),
-  probe: (args) => ipcRenderer.invoke(IPCCHANNELS.PROBE, args),
-  transcribe: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_TRANSCRIBE, args),
-  encodeForWhisper: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE, args),
-  encodeAudioForBrowser: (args) => ipcRenderer.invoke(IPCCHANNELS.WHISPER_ENCODE_AUDIO, args),
-  getDownloadsFolder: () => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER),
+  getModelDownloadsFolder: () =>
+    ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER),
   showOpenDialog: (args) => ipcRenderer.invoke(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, args),
-  exportSubtitles: (args) => ipcRenderer.invoke(IPCCHANNELS.EXPORT_SUBTITLES, args),
   createJob: (args) => ipcRenderer.invoke(IPCCHANNELS.CREATE_JOB, args),
   getJobList: (args) => ipcRenderer.invoke(IPCCHANNELS.GET_JOBLIST, args),
   getTranscribeOptions: () => ipcRenderer.invoke(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS),
   updateTranscribeOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, args),
   queuePendingJobs: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_PENDING_JOBS),
+  download: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_MANAGER_DOWNLOAD, args),
+  cancel: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_MANAGER_CANCEL, args),
+  getModelList: () => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST),
+  deleteModel: (modelName) => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_DELETE_MODEL, modelName),
+  showMessageBox: (options) => ipcRenderer.invoke(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, options),
 
   // main -> renderer
-  onDownloadStarted: (callback) =>
-    ipcRenderer.on('download-started', (_event, value) => callback(value)),
-  onDownloadProgress: (callback) =>
-    ipcRenderer.on('download-progress', (_event, value) => callback(value)),
-  onDownloadCompleted: (callback) =>
-    ipcRenderer.on('download-completed', (_event, value) => callback(value)),
+  onDownloadStarted: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_STARTED, subscription)
 
-  onSubtitleAdded: (callback) =>
-    ipcRenderer.on('segments:segment-added', (_event, value) => callback(value))
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_STARTED, subscription)
+    }
+  },
+  onDownloadProgress: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_PROGRESS, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_PROGRESS, subscription)
+    }
+  },
+  onDownloadCompleted: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_COMPLETED, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_COMPLETED, subscription)
+    }
+  },
+  onDownloadCancelled: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_CANCELLED, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_CANCELLED, subscription)
+    }
+  },
+  onDownloadInterrupted: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_INTERRUPTED, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_INTERRUPTED, subscription)
+    }
+  },
+  onDownloadError: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_ERROR, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_ERROR, subscription)
+    }
+  },
+  onSubtitleAdded: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on('segments:segment-added', subscription)
+
+    return () => {
+      ipcRenderer.removeListener('segments:segment-added', subscription)
+    }
+  },
+  onModelListUpdated: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.MODEL_MANAGER_SET_MODEL_LIST, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.MODEL_MANAGER_SET_MODEL_LIST, subscription)
+    }
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

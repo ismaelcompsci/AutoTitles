@@ -4,15 +4,15 @@ import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 // @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import { downloadWhisperModel } from './handle/download-whisper-model'
-import { ElectronDownloadManager } from 'electron-dl-manager'
-import { encodeAudioForBrowser } from './handle/encode-for-browser'
-import { DEFAULT_DOWNLOADS_DIR, getDownloadsFolder, showOpenDialog } from './handle/filesystem'
+import { DEFAULT_DOWNLOADS_DIR, getModelDownloadsFolder } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
-import { exportSubtitles } from './handle/export-subtitles'
 import { QueueManager } from './queue/queue-manager'
 import { ExportJobData, JobType, TranscribeJobData } from '../shared/models'
 import { JobDataForType } from '../shared/models'
+import { initializeDefaultData } from './db'
+import { cancel, download } from './download-manager'
+import { deleteModel, getModelList } from './model-manager'
+import { showMessageBox, showOpenDialog } from './handle/dialog'
 
 const appIcon = nativeImage.createFromPath(icon)
 
@@ -71,11 +71,9 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle(IPCCHANNELS.DOWNLOAD_WHISPER_MODEL, downloadWhisperModel)
-  ipcMain.handle(IPCCHANNELS.WHISPER_ENCODE_AUDIO, encodeAudioForBrowser)
-  ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_DOWNLOADS_FOLDER, getDownloadsFolder)
+  ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER, getModelDownloadsFolder)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
-  ipcMain.handle(IPCCHANNELS.EXPORT_SUBTITLES, exportSubtitles)
+  ipcMain.handle(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, showMessageBox)
 
   createWindow()
 
@@ -102,10 +100,35 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
 
-export const downloadManager = new ElectronDownloadManager()
 setupQueueHandlers()
+setupDownloadManger()
+setupModelManager()
+initializeDefaultData()
 
-// Move IPC handlers to a separate file
+async function setupModelManager() {
+  ipcMain.handle(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST, (_event) => {
+    return getModelList()
+  })
+
+  ipcMain.handle(IPCCHANNELS.MODEL_MANAGER_DELETE_MODEL, async (_event, modelName: string) => {
+    await deleteModel(modelName)
+
+    const window = BrowserWindow.getFocusedWindow()
+    window?.webContents.send(IPCCHANNELS.MODEL_MANAGER_SET_MODEL_LIST, getModelList())
+  })
+}
+
+async function setupDownloadManger() {
+  ipcMain.handle(IPCCHANNELS.DOWNLOAD_MANAGER_DOWNLOAD, async (_event, data) => {
+    return await download(_event, data)
+  })
+
+  ipcMain.handle(IPCCHANNELS.DOWNLOAD_MANAGER_CANCEL, async (_event, data) => {
+    const { id } = data
+    cancel(id)
+  })
+}
+
 async function setupQueueHandlers() {
   const queue = QueueManager.getInstance()
   await queue.init()

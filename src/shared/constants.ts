@@ -1,23 +1,28 @@
-export const ROUTES = {
-  HOME: '/',
-  SETTINGS: '/SETTINGS'
-}
-
 export const IPCCHANNELS = {
-  DOWNLOAD_WHISPER_MODEL: 'download-whisper-modal',
-  WHISPER_TRANSCRIBE: 'whisper:transcribe',
-  WHISPER_ENCODE: 'whisper:encode',
-  WHISPER_ENCODE_AUDIO: 'whisper:encodeaudio',
-  FILESYSTEM_GET_DOWNLOADS_FOLDER: 'filesystem:getDownloadsFolder',
-  PROBE: 'filesystem:probe',
-  FILESYSTEM_CHOOSE_FOLDER: 'dialog:showOpenDialog',
-  EXPORT_SUBTITLES: 'export-subtitles',
+  FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER: 'filesystem:getDownloadsFolder',
+  FILESYSTEM_CHOOSE_FOLDER: 'dialog.showOpenDialog',
 
   CREATE_JOB: 'queue.createJob',
   GET_JOBLIST: 'queue.getJobList',
   QUEUE_PENDING_JOBS: 'queue.queuePendingJobs',
   GET_TRANSCRIBE_OPTIONS: 'queue.getTranscribeOptions',
-  UPDATE_TRANSCRIBE_OPTION: 'queue.updateTranscribeOption'
+  UPDATE_TRANSCRIBE_OPTION: 'queue.updateTranscribeOption',
+
+  DOWNLOAD_MANAGER_DOWNLOAD: 'downloadManager.download',
+  DOWNLOAD_MANAGER_CANCEL: 'downloadManager.cancel',
+
+  DOWNLOAD_MANAGER_STARTED: 'downloadManager.started',
+  DOWNLOAD_MANAGER_PROGRESS: 'downloadManager.progress',
+  DOWNLOAD_MANAGER_COMPLETED: 'downloadManager.completed',
+  DOWNLOAD_MANAGER_CANCELLED: 'downloadManager.cancelled',
+  DOWNLOAD_MANAGER_INTERRUPTED: 'downloadManager.interrupted',
+  DOWNLOAD_MANAGER_ERROR: 'downloadManager.error',
+
+  MODEL_MANAGER_GET_MODEL_LIST: 'modelManager.getModelList',
+  MODEL_MANAGER_DELETE_MODEL: 'modelManager.deleteModel',
+  MODEL_MANAGER_SET_MODEL_LIST: 'modelManager.setModelList',
+
+  DIALOG_SHOW_MESSAGE_BOX: 'dialog.showMessageBox'
 } as const
 
 export const MODELS = [
@@ -35,7 +40,7 @@ export const MODELS = [
   'large-v3-turbo'
 ] as const
 
-export const modelSizes: { [key in WhisperModel]: string } = {
+export const modelSizes: Record<string, string> = {
   tiny: '77.7 MB',
   'tiny.en': '77.7 MB',
   base: '148 MB',
