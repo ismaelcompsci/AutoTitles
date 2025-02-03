@@ -22,6 +22,7 @@ type WavesurferContext = {
   regionsPlugin: RegionsPlugin
   addRegion: (subtitle: Subtitle) => void
   reloadMedia: () => void
+  clearRegions: () => void
 }
 
 const WavesurferContext = createContext<WavesurferContext | undefined>(undefined)
@@ -152,6 +153,10 @@ export const WavesurferProvider = ({ children }: Props) => {
     [regionsPlugin]
   )
 
+  const clearRegions = useCallback(() => {
+    regionsPlugin.clearRegions()
+  }, [])
+
   return (
     <WavesurferContext.Provider
       value={{
@@ -160,7 +165,8 @@ export const WavesurferProvider = ({ children }: Props) => {
         videoRef,
         regionsPlugin,
         addRegion,
-        reloadMedia
+        reloadMedia,
+        clearRegions
       }}
     >
       {children}

@@ -39,13 +39,14 @@ export const ResizablePanel = ({
         whileTap={{ opacity: 1 }}
         transition={{ ease: 'easeInOut', duration: 0.2 }}
         style={{ opacity: 0 }}
-        className="h-1 cursor-row-resize group relative z-20"
+        className="h-px cursor-row-resize group relative z-20"
       >
         <motion.div className="-top-[1px] absolute inset-0 flex justify-center">
           <div className="bg-background-200 h-2 w-5 rounded-sm absolute" />
           <GripHorizontal className="h-2 w-2 absolute" />
         </motion.div>
       </motion.div>
+      {/*  */}
       <motion.div
         layout
         transition={{ type: 'ease', ease: 'easeInOut', duration: 0.2 }}

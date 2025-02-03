@@ -5,6 +5,7 @@ import { WavesurferProvider } from './components/common/wavesurfer-provider'
 import { TailwindIndicator } from './components/tailwind-indicator'
 import { SidebarProvider } from './components/ui/sidebar'
 import { Toaster } from './components/ui/toaster'
+import { AppSidebar } from './components/sidebar/app-sidebar'
 
 export function App(): JSX.Element {
   return (
@@ -16,8 +17,13 @@ export function App(): JSX.Element {
 
             {/* main */}
             <main className="isolate flex size-full overflow-hidden bg-background-200">
-              {/* <div className="relative flex h-full w-[220px] bg-background-200"></div> */}
+              <div className="relative flex h-full bg-background-200">
+                {/* <div className="w-48" /> */}
+                <AppSidebar />
+              </div>
+              {/* <SidebarInset> */}
               <MainView />
+              {/* </SidebarInset> */}
             </main>
 
             <TailwindIndicator />

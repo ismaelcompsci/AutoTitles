@@ -14,17 +14,29 @@ import { FileVolume, MoveRight } from 'lucide-react'
 import NumberInput from '../common/number-input'
 import { ConfigSection } from '../common/config-section'
 import { ConfigItem } from '../common/config-item'
-import { audioURLAtom, pageAtom, transcribeJobListAtom, transcribeOptionsAtom } from '@/state/state'
+import {
+  audioURLAtom,
+  durationAtom,
+  pageAtom,
+  subtitlesAtom,
+  subtitlesByIdAtom,
+  transcribeJobListAtom,
+  transcribeOptionsAtom
+} from '@/state/state'
 import { Page } from '../ui/page'
 import { useEffect, useState } from 'react'
 import { ModelCategory, WhisperInputConfig } from 'src/shared/models'
+import { useWavesurfer } from '../common/wavesurfer-provider'
 
 export const TranscriptionConfigurationView = () => {
   const setPage = useSetAtom(pageAtom)
   const setAudioURL = useSetAtom(audioURLAtom)
-
+  const setSubtitles = useSetAtom(subtitlesAtom)
+  const setSubtitlesById = useSetAtom(subtitlesByIdAtom)
+  const setDuration = useSetAtom(durationAtom)
   const [transcribeOptions, setTranscribeOptions] = useAtom(transcribeOptionsAtom)
   const transcribeJobList = useAtomValue(transcribeJobListAtom)
+  const { clearRegions } = useWavesurfer()
 
   const job = transcribeJobList[0]
 
@@ -33,6 +45,10 @@ export const TranscriptionConfigurationView = () => {
       await window.api.queuePendingJobs()
 
       setAudioURL(job.filePath)
+      setSubtitles([])
+      setSubtitlesById({})
+      clearRegions()
+      setDuration(0)
       setPage('transcript')
     } catch (e) {
       console.log(e)

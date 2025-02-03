@@ -40,6 +40,18 @@ export class QueueManager {
     })
   }
 
+  clear = async () => {
+    const jobs = await this.queue?.listJobs()
+
+    if (jobs) {
+      for (const job of jobs) {
+        this.queue?.removeJob(job)
+      }
+    }
+
+    this.pendingJobs.splice(0, this.pendingJobs.length)
+  }
+
   getJobList = (type: string) => {
     return this.pendingJobs?.filter((job) => job.type === type) as QueueJob[]
   }

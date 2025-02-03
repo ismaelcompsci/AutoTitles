@@ -7,6 +7,7 @@ export const IPCCHANNELS = {
   QUEUE_PENDING_JOBS: 'queue.queuePendingJobs',
   GET_TRANSCRIBE_OPTIONS: 'queue.getTranscribeOptions',
   UPDATE_TRANSCRIBE_OPTION: 'queue.updateTranscribeOption',
+  QUEUE_CLEAR: 'queue.clear',
 
   DOWNLOAD_MANAGER_DOWNLOAD: 'downloadManager.download',
   DOWNLOAD_MANAGER_CANCEL: 'downloadManager.cancel',

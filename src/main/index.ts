@@ -181,4 +181,8 @@ async function setupQueueHandlers() {
       }
     })
   })
+
+  ipcMain.handle(IPCCHANNELS.QUEUE_CLEAR, () => {
+    return QueueManager.getInstance().clear()
+  })
 }

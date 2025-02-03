@@ -1,5 +1,4 @@
-import { Home, Settings } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { AudioWaveform, Home, Package } from 'lucide-react'
 
 import {
   Sidebar,
@@ -8,29 +7,34 @@ import {
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar
+  SidebarMenuItem
 } from '@/components/ui/sidebar'
+import { useSetAtom } from 'jotai'
+import { Page, pageAtom } from '@/state/state'
 
-// Menu items.
 const items = [
   {
     title: 'Home',
-    url: '/home',
+    page: 'home',
     icon: Home
   },
   {
-    title: 'Settings',
-    url: '/settings',
-    icon: Settings
+    title: 'Transcription',
+    page: 'transcript',
+    icon: AudioWaveform
+  },
+  {
+    title: 'Model Manager',
+    page: 'model-manager',
+    icon: Package
   }
 ]
 
 export function AppSidebar() {
-  const { setOpen } = useSidebar()
+  const setPage = useSetAtom(pageAtom)
 
   return (
-    <Sidebar>
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarContent>
         <div className="px-3.5">
           <div className="h-10 mt-0 flex items-center px-[1px]">
@@ -46,14 +50,12 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     className="group hover:text-gray-1000 text-gray-900"
                     asChild
-                    onClick={() => {
-                      setOpen(false)
-                    }}
+                    onClick={() => setPage(item.page as Page)}
                   >
-                    <Link to={item.url}>
+                    <div>
                       <item.icon className="" />
                       <span>{item.title}</span>
-                    </Link>
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

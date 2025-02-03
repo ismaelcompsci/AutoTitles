@@ -39,7 +39,9 @@ export const Waveform = () => {
       {typeof audioURL === 'string' ? (
         <div id="waveform" ref={containerRef} className="flex-1 overflow-hidden" />
       ) : (
-        <div>error...</div>
+        <div className="size-full flex justify-center items-center">
+          <p className="text-muted-foreground text-xs">hmm, something is missing...</p>
+        </div>
       )}
     </div>
   )

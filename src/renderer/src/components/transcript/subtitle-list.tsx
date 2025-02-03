@@ -69,7 +69,9 @@ export const SubtitleList = () => {
             })}
           </div>
         ) : (
-          <div>empty...</div>
+          <div className="size-full flex justify-center items-center">
+            <p className="text-muted-foreground text-xs">...</p>
+          </div>
         )}
       </div>
     </div>

@@ -26,6 +26,7 @@ interface QueueMangaerAPI {
   getTranscribeOptions: () => Promise<WhisperInputConfig>
   updateTranscribeOptions: (args: { key: string; value: string }) => Promise<void>
   queuePendingJobs: () => Promise<void>
+  clearQueue: () => Promise<void>
 
   onSubtitleAdded: (callback: (value: Subtitle) => void) => () => void
 }

@@ -18,6 +18,7 @@ const api: IAPI = {
   getModelList: () => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST),
   deleteModel: (modelName) => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_DELETE_MODEL, modelName),
   showMessageBox: (options) => ipcRenderer.invoke(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, options),
+  clearQueue: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_CLEAR),
 
   // main -> renderer
   onDownloadStarted: (callback) => {

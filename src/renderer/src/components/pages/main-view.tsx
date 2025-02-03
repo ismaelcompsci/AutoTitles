@@ -32,10 +32,10 @@ export const MainView = () => {
   }
 
   return (
-    <div className={cn('z-0 size-full p-0', false && 'md:pb-2.5 md:pl-0 md:pr-2.5')}>
+    <div className={cn('z-0 size-full p-0', 'md:pb-2.5 md:pl-0 md:pr-2.5')}>
       <div
         ref={setMainContainerRef}
-        className="relative size-full bg-background-100 overflow-hidden md:rounded-sm border-[0.5px] rounded-none"
+        className="relative size-full bg-background-100 overflow-hidden md:rounded-sm border-[0.5px] rounded-none contain-inline-size [container-type:inline-size]"
       >
         <View />
       </div>

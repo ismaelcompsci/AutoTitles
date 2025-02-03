@@ -120,7 +120,7 @@ export const ModelManagerView = () => {
   }, [])
 
   if (isLoading) {
-    return null
+    return <></>
   }
 
   return (
