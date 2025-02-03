@@ -18,12 +18,10 @@ export function App(): JSX.Element {
             {/* main */}
             <main className="isolate flex size-full overflow-hidden bg-background-200">
               <div className="relative flex h-full bg-background-200">
-                {/* <div className="w-48" /> */}
                 <AppSidebar />
               </div>
-              {/* <SidebarInset> */}
+
               <MainView />
-              {/* </SidebarInset> */}
             </main>
 
             <TailwindIndicator />

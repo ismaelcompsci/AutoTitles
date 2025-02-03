@@ -1,10 +1,14 @@
 import { MoveLeft, MoveRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { useAtomValue } from 'jotai'
+import { pageHistory } from '@/state/state'
 
 export const AppHeader = () => {
+  const { undo, canRedo, redo, canUndo } = useAtomValue(pageHistory)
+
   return (
-    <div className="header bg-background-200 h-10 flex items-center gap-8 shrink-0 drag">
+    <div className="bg-background-200 h-10 flex items-center gap-8 shrink-0 drag">
       <div
         style={{
           paddingLeft: '81px'
@@ -14,11 +18,12 @@ export const AppHeader = () => {
         <SidebarTrigger className="drag-none" />
 
         <Button
-          disabled={true}
+          disabled={!canUndo}
           className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
           size={'tiny'}
           shape="square"
           variant={'tertiary'}
+          onClick={undo}
         >
           <MoveLeft className="h-4 w-4" />
         </Button>
@@ -27,8 +32,9 @@ export const AppHeader = () => {
           className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
           size={'tiny'}
           shape="square"
-          disabled={true}
+          disabled={!canRedo}
           variant={'tertiary'}
+          onClick={redo}
         >
           <MoveRight className="h-4 w-4 text-muted" />
         </Button>

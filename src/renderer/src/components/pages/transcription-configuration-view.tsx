@@ -147,10 +147,10 @@ export const TranscriptConfigurationForm = ({
 
   return (
     <ConfigSection title="General">
-      <ConfigItem label="Model" divider>
+      <ConfigItem label="Model" divider className="flex flex-1">
         <Button
           size={'tiny'}
-          className="ml-4"
+          className="ml-2"
           onClick={() => {
             setPage('model-manager')
           }}
@@ -164,7 +164,7 @@ export const TranscriptConfigurationForm = ({
           defaultValue={transcribeOptions.model}
           onValueChange={(value) => handleValueChange('model', value)}
         >
-          <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
+          <SelectTrigger className="border-none gap-1 w-fit">
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent className="bg-background">
