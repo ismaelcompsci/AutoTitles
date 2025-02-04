@@ -25,6 +25,7 @@ const ExportOptions = [
 export const ExportView = () => {
   const [exportJobList, setExportJobList] = useAtom(exportJobListAtom)
   const job = exportJobList[0]
+  console.log(job)
 
   const getExportJobList = async () => {
     const exportJobList = await window.api.getJobList({ type: 'Export' })
@@ -34,7 +35,7 @@ export const ExportView = () => {
   }
 
   const handleFolderSelect = async () => {
-    const folder = await window.api.showOpenDialog({
+    await window.api.showOpenDialog({
       properties: ['createDirectory', 'openDirectory'],
       message: 'Choose a destination folder',
       // defaultPath:

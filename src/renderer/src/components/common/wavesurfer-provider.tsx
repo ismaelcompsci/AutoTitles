@@ -10,8 +10,15 @@ import {
   useCallback
 } from 'react'
 import WaveSurfer from 'wavesurfer.js'
-import { audioURLAtom, currentTimeAtom, durationAtom, playingAtom } from '../../state/state'
-import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions'
+import {
+  activeRegionIdAtom,
+  audioURLAtom,
+  currentTimeAtom,
+  durationAtom,
+  playingAtom
+} from '../../state/state'
+import RegionsPlugin, { Region } from 'wavesurfer.js/dist/plugins/regions'
+import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom'
 import { Subtitle } from 'src/shared/models'
 import { store } from '@/state/store'
 
@@ -23,14 +30,14 @@ type WavesurferContext = {
   addRegion: (subtitle: Subtitle) => void
   reloadMedia: () => void
   clearRegions: () => void
+  selectRegion: (id: string) => void
 }
 
 const WavesurferContext = createContext<WavesurferContext | undefined>(undefined)
 
 const regionColor = {
   default: 'rgb(214 214 215 / 0.08)',
-  selected: 'rgb(56 189 248 / 0.27)',
-  bookmarked: 'rgb(251 191 36 / 0.26)'
+  selected: 'hsla(213, 94%, 42%, 0.24)'
 }
 
 type Props = {
@@ -42,11 +49,14 @@ export const WavesurferProvider = ({ children }: Props) => {
   const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const zoomPlugin = useMemo(() => ZoomPlugin.create({ maxZoom: 400 }), [])
   const regionsPlugin = useMemo(() => RegionsPlugin.create(), [])
 
   const setDuration = useSetAtom(durationAtom)
   const setIsPlaying = useSetAtom(playingAtom)
   const setCurrentTime = useSetAtom(currentTimeAtom)
+  const setActiveRegionId = useSetAtom(activeRegionIdAtom)
+  const setAudioURL = useSetAtom(audioURLAtom)
 
   const renderRegions = useCallback(() => {}, [])
 
@@ -69,13 +79,10 @@ export const WavesurferProvider = ({ children }: Props) => {
     setCurrentTime(currentTime)
   }, [])
 
-  const handleLoading = useCallback((progress: number) => {
-    // Add your loading logic here
-  }, [])
+  const handleLoading = useCallback((_progress: number) => {}, [])
 
-  const handleError = useCallback((error: Error) => {
-    // Add your error handling logic here
-    console.error('Wavesurfer error:', error)
+  const handleError = useCallback((_error: Error) => {
+    setAudioURL(null)
   }, [])
 
   const reloadMedia = useCallback(() => {
@@ -89,6 +96,35 @@ export const WavesurferProvider = ({ children }: Props) => {
       wavesurfer.setTime(store.get(currentTimeAtom))
     }
   }, [containerRef, videoRef, wavesurfer])
+
+  const selectRegion = useCallback(
+    (id: string) => {
+      const regionsToSelect = regionsPlugin
+        .getRegions()
+        .filter((region) => region.id.startsWith(id))
+
+      if (regionsToSelect.length > 0) {
+        regionsToSelect.forEach((r) => r.setOptions({ color: regionColor.selected }))
+      }
+    },
+    [regionsPlugin]
+  )
+
+  const handleRegionIn = useCallback(
+    (region: Region) => {
+      const activeRegionId = store.get(activeRegionIdAtom)
+      if (activeRegionId) {
+        const regionToReset = regionsPlugin
+          .getRegions()
+          .find((region) => region.id === activeRegionId)
+
+        regionToReset?.setOptions({ color: regionColor.default })
+      }
+
+      setActiveRegionId(region.id)
+    },
+    [regionsPlugin]
+  )
 
   useEffect(() => {
     if (containerRef.current) {
@@ -105,7 +141,7 @@ export const WavesurferProvider = ({ children }: Props) => {
         container: containerRef.current,
         url: audioURL ?? undefined,
         media: videoRef.current ?? undefined,
-        plugins: [regionsPlugin]
+        plugins: [regionsPlugin, zoomPlugin]
       })
 
       setWavesurfer(ws)
@@ -116,7 +152,11 @@ export const WavesurferProvider = ({ children }: Props) => {
         ws.on('pause', handlePause),
         ws.on('timeupdate', handleTimeUpdate),
         ws.on('loading', handleLoading),
-        ws.on('error', handleError)
+        ws.on('error', handleError),
+
+        regionsPlugin.on('region-in', handleRegionIn)
+        // regionsPlugin.on('region-clicked', handleRegionClicked),
+        // regionsPlugin.on('region-double-clicked', handleRegionDoubleClicked)
       ]
 
       return () => {
@@ -126,7 +166,7 @@ export const WavesurferProvider = ({ children }: Props) => {
     }
 
     return
-  }, [containerRef, videoRef, audioURL, regionsPlugin])
+  }, [containerRef, videoRef, audioURL, regionsPlugin, zoomPlugin])
 
   useEffect(() => {
     if (!videoRef.current || !audioURL) {
@@ -166,7 +206,8 @@ export const WavesurferProvider = ({ children }: Props) => {
         regionsPlugin,
         addRegion,
         reloadMedia,
-        clearRegions
+        clearRegions,
+        selectRegion
       }}
     >
       {children}

@@ -4,8 +4,8 @@ import { clampPosition, cn, millisecondsToTimestamp, scrollItemToCenter } from '
 import { useWavesurfer } from '../common/wavesurfer-provider'
 import { subtitlesAtom } from '@/state/state'
 import { durationAtom } from '@/state/state'
-
 import { activeRegionIdAtom } from '@/state/state'
+
 export const SubtitleList = () => {
   const subtitles = useAtomValue(subtitlesAtom)
   const activeRegionId = useAtomValue(activeRegionIdAtom)

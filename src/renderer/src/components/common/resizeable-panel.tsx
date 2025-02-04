@@ -15,15 +15,15 @@ export const ResizablePanel = ({
   const size = useRef(defaultSize)
   const currentSizeM = useMotionValue(size.current)
 
-  const handleDragStart = (event: PointerEvent, info: PanInfo) => {
+  const handleDragStart = (_event: PointerEvent, _info: PanInfo) => {
     isDragging.current = true
   }
-  const handleDrag = (event: PointerEvent, info: PanInfo) => {
+  const handleDrag = (_event: PointerEvent, info: PanInfo) => {
     const currentSize = size.current - info.offset.y
 
     currentSizeM.set(Math.max(minSize, currentSize))
   }
-  const handleDragEnd = (event: PointerEvent, info: PanInfo) => {
+  const handleDragEnd = (_event: PointerEvent, _info: PanInfo) => {
     size.current = Math.max(minSize, currentSizeM.get())
     isDragging.current = false
   }

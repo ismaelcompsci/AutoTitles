@@ -8,6 +8,7 @@ import { Slider } from '../common/slider'
 import { useWavesurfer } from '../common/wavesurfer-provider'
 import { currentTimeAtom, playingAtom } from '@/state/state'
 import { durationAtom } from '@/state/state'
+import { debounce } from 'lodash'
 
 const TimeSlider = () => {
   const duration = useAtomValue(durationAtom)
@@ -98,13 +99,17 @@ export const MediaPlayerControls = () => {
 }
 
 export const VolumeSlider = () => {
-  const [volume, setVolume] = useState(100)
+  const [volume, setVolume] = useState(getStoredVolume() ?? 75)
   const { ws } = useWavesurfer()
 
   useEffect(() => {
     if (!ws) return
+
     ws.setVolume(volume / 100)
-  }, [volume])
+    storeVolume(volume)
+  }, [volume, ws])
+
+  const storeVolume = debounce(setStoredVolume, 100)
 
   return (
     <Popover>
@@ -128,4 +133,18 @@ export const VolumeSlider = () => {
       </PopoverContent>
     </Popover>
   )
+}
+
+const setStoredVolume = (volume: number) => {
+  localStorage.setItem(`volume`, volume.toString())
+}
+
+const getStoredVolume = (): number | undefined => {
+  const volumeString = localStorage.getItem(`volume`)
+
+  if (volumeString) {
+    return Number(volumeString)
+  }
+
+  return undefined
 }

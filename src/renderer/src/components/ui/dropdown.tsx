@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, Circle } from 'lucide-react'
 
@@ -72,7 +71,7 @@ const MenuLink = React.forwardRef<
   }
 >(({ className, href, children, ...props }) => (
   <MenuItem asChild {...props}>
-    <Link to={href}>{children}</Link>
+    <p>{children}</p>
   </MenuItem>
 ))
 MenuLink.displayName = DropdownMenuPrimitive.Item.displayName

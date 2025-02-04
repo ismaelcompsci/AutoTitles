@@ -29,7 +29,7 @@ export const AppHeader = () => {
         </Button>
 
         <Button
-          className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
+          className="px-0 disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
           size={'tiny'}
           shape="square"
           disabled={!canRedo}

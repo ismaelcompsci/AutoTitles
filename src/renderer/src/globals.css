@@ -384,7 +384,7 @@ html {
     --geist-success-lighter: #d3e5ff;
     --geist-success-light: #3291ff;
     --geist-success: #0070f3;
-    --geist-success-dark: #0761d1;
+    --geist-success-dark: hsl(213, 94%, 42%);
   }
 }
 

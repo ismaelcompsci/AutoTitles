@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai'
-import { audioURLAtom, subtitlesAtom, subtitlesByIdAtom } from '@/state/state'
+import { activeRegionIdAtom, audioURLAtom, subtitlesAtom, subtitlesByIdAtom } from '@/state/state'
 import { useEffect } from 'react'
 
 import { useWavesurfer } from '../common/wavesurfer-provider'
@@ -8,7 +8,14 @@ export const Waveform = () => {
   const [subtitles, setSubtitles] = useAtom(subtitlesAtom)
   const [subtitlesById, setSubtitlesById] = useAtom(subtitlesByIdAtom)
   const audioURL = useAtomValue(audioURLAtom)
-  const { ws, containerRef, addRegion, reloadMedia } = useWavesurfer()
+  const { ws, containerRef, addRegion, reloadMedia, selectRegion } = useWavesurfer()
+  const activeRegionId = useAtomValue(activeRegionIdAtom)
+
+  useEffect(() => {
+    if (activeRegionId) {
+      selectRegion(activeRegionId)
+    }
+  }, [activeRegionId])
 
   useEffect(() => {
     setTimeout(() => {
