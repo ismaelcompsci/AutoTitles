@@ -4,10 +4,11 @@ import { SubtitleList } from '../transcript/subtitle-list'
 import { Waveform } from '../transcript/waveform'
 import { ResizablePanel } from '../common/resizeable-panel'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { pageAtom, transcribeJobListAtom } from '@/state/state'
+import { audioURLAtom, pageAtom, transcribeJobListAtom } from '@/state/state'
 import { Button } from '../ui/button'
 import { ArrowRight } from 'lucide-react'
 import { TranscribeListSerialized } from 'src/shared/models'
+import { getBasename } from '@/lib/utils'
 
 export const TranscriptView = () => {
   return (
@@ -47,19 +48,23 @@ export const TopPanel = () => {
 
 const TranscriptHeader = () => {
   const setPage = useSetAtom(pageAtom)
-  const transcribeJobList = useAtomValue(transcribeJobListAtom)
-  const job = transcribeJobList[0] as TranscribeListSerialized | null
+  const currentFile = useAtomValue(audioURLAtom)
 
   const handleStartExport = async () => {
-    await window.api.createJob({ type: 'Export', data: { filePath: job?.filePath } })
+    if (!currentFile) return
+
+    await window.api.createJob({
+      type: 'Export',
+      data: { originalMediaFilePath: currentFile }
+    })
     setPage('export')
   }
 
   return (
     <div className="relative min-h-9 px-4 text-gray-900 drag-none border-b-[0.5px] justify-center gap-3 max-w-full flex items-center text-xs font-medium ">
-      {job?.fileName && (
+      {currentFile && (
         <>
-          <span>{job?.fileName}</span>
+          <span>{getBasename(currentFile)}</span>
 
           <div className="absolute inset-y-0 right-0 flex items-center px-2">
             <Button

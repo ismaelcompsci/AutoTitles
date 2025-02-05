@@ -7,10 +7,13 @@ import {
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  SidebarTrigger
 } from '@/components/ui/sidebar'
-import { useSetAtom } from 'jotai'
-import { Page, pageAtom } from '@/state/state'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { Page, pageAtom, pageHistory } from '@/state/state'
+import { Button } from '../ui/button'
+import { ArrowLeftIcon, ArrowRightIcon, Share2Icon } from '@radix-ui/react-icons'
 
 const items = [
   {
@@ -24,6 +27,11 @@ const items = [
     icon: AudioWaveform
   },
   {
+    title: 'Export Manager',
+    page: 'export',
+    icon: Share2Icon
+  },
+  {
     title: 'Model Manager',
     page: 'model-manager',
     icon: Package
@@ -34,12 +42,14 @@ export function AppSidebar() {
   const setPage = useSetAtom(pageAtom)
 
   return (
-    <Sidebar variant="inset" collapsible="icon">
+    <Sidebar variant="inset" className="p-0">
       <SidebarContent>
         <div className="px-3.5">
-          <div className="h-10 mt-0 flex items-center px-[1px]">
+          <div className="min-h-[40px] mt-0 flex items-center px-[1px]">
             <div className="flex-1 flex" />
             {/* STUFF HERE */}
+            <SidebarTrigger className="drag-none" />
+            <HistoryControls />
           </div>
         </div>
         <SidebarGroup>
@@ -48,13 +58,13 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    className="group hover:text-gray-1000 text-gray-900"
+                    className=""
                     asChild
                     onClick={() => setPage(item.page as Page)}
                   >
-                    <div>
-                      <item.icon className="" />
-                      <span>{item.title}</span>
+                    <div className="group/item">
+                      <item.icon className="group-hover/item:text-primary text-gray-900" />
+                      <span className="text-xs">{item.title}</span>
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -64,5 +74,34 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
+  )
+}
+
+export const HistoryControls = () => {
+  const { undo, canRedo, redo, canUndo } = useAtomValue(pageHistory)
+  return (
+    <>
+      <Button
+        className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
+        disabled={!canUndo}
+        size={'tiny'}
+        shape="square"
+        variant={'tertiary'}
+        onClick={undo}
+      >
+        <ArrowLeftIcon className="h-4 w-4" />
+      </Button>
+
+      <Button
+        className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
+        size={'tiny'}
+        shape="square"
+        disabled={!canRedo}
+        variant={'tertiary'}
+        onClick={redo}
+      >
+        <ArrowRightIcon className="h-4 w-4 text-muted" />
+      </Button>
+    </>
   )
 }

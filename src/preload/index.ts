@@ -12,13 +12,15 @@ const api: IAPI = {
   getJobList: (args) => ipcRenderer.invoke(IPCCHANNELS.GET_JOBLIST, args),
   getTranscribeOptions: () => ipcRenderer.invoke(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS),
   updateTranscribeOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, args),
-  queuePendingJobs: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_PENDING_JOBS),
+  queuePendingJobs: (args) => ipcRenderer.invoke(IPCCHANNELS.QUEUE_PENDING_JOBS, args),
   download: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_MANAGER_DOWNLOAD, args),
   cancel: (args) => ipcRenderer.invoke(IPCCHANNELS.DOWNLOAD_MANAGER_CANCEL, args),
   getModelList: () => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST),
   deleteModel: (modelName) => ipcRenderer.invoke(IPCCHANNELS.MODEL_MANAGER_DELETE_MODEL, modelName),
   showMessageBox: (options) => ipcRenderer.invoke(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, options),
   clearQueue: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_CLEAR),
+  getExportOptions: () => ipcRenderer.invoke(IPCCHANNELS.GET_EXPORT_OPTIONS),
+  updateExportOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_EXPORT_OPTION, args),
 
   // main -> renderer
   onDownloadStarted: (callback) => {

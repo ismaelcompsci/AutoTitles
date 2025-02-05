@@ -20,7 +20,7 @@ export const HomeView = () => {
 
     if (filePath) {
       await window.api.createJob({
-        data: { filePath: `file://${filePath}` },
+        data: { originalMediaFilePath: `file://${filePath}` },
         type: 'Transcribe'
       })
 

@@ -27,6 +27,7 @@ import { Page } from '../ui/page'
 import { useEffect, useState } from 'react'
 import { ModelCategory, WhisperInputConfig } from 'src/shared/models'
 import { useWavesurfer } from '../common/wavesurfer-provider'
+import { getBasename } from '@/lib/utils'
 
 export const TranscriptionConfigurationView = () => {
   const setPage = useSetAtom(pageAtom)
@@ -38,13 +39,13 @@ export const TranscriptionConfigurationView = () => {
   const transcribeJobList = useAtomValue(transcribeJobListAtom)
   const { clearRegions } = useWavesurfer()
 
-  const job = transcribeJobList[0]
-
   const handleStartTranscription = async () => {
     try {
       await window.api.queuePendingJobs()
 
-      setAudioURL(job.filePath)
+      const job = transcribeJobList[0]
+
+      setAudioURL(job.originalMediaFilePath)
       setSubtitles([])
       setSubtitlesById({})
       clearRegions()
@@ -102,17 +103,22 @@ export const TranscriptionConfigurationView = () => {
           {transcribeOptions && (
             <TranscriptConfigurationForm transcribeOptions={transcribeOptions} />
           )}
+          {transcribeJobList.length !== 0 && (
+            <ConfigSection title="Info">
+              {transcribeJobList.map((job) => (
+                <ConfigItem key={job.id} label="" className="text-sm text-muted-foreground">
+                  <div className="flex flex-row grow gap-4 items-center">
+                    <FileVolume className="h-4 w-4" />
+                    <span className="line-clamp-1 pr-4 text-balance">
+                      {getBasename(job.originalMediaFilePath)}
+                    </span>
+                  </div>
 
-          <ConfigSection title="Info">
-            <ConfigItem label="" className="text-sm text-muted-foreground">
-              <div className="flex flex-row grow gap-4 items-center">
-                <FileVolume className="h-4 w-4" />
-                <span className="line-clamp-1 pr-4 text-balance">{job?.fileName}</span>
-              </div>
-
-              <div className="grow" />
-            </ConfigItem>
-          </ConfigSection>
+                  <div className="grow" />
+                </ConfigItem>
+              ))}
+            </ConfigSection>
+          )}
         </div>
 
         <Button

@@ -1,15 +1,19 @@
-import EmbeddedQueue, { CreateJobData, Job } from 'embedded-queue'
+import EmbeddedQueue, { CreateJobData, Job, Processor } from 'embedded-queue'
 import { v4 as uuid } from 'uuid'
-import path from 'path'
-import { QueueJob, WhisperInputConfig } from '../../shared/models'
+import {
+  ExportConfig,
+  ExportListSerialized,
+  QueueJob,
+  SerializedJobForType,
+  TranscribeListSerialized,
+  WhisperInputConfig
+} from '../../shared/models'
 import { ExportJobData, TranscribeJobData } from '../../shared/models'
 import { JobType } from '../../shared/models'
 import { JobDataForType } from '../../shared/models'
 
 import { handleExportJob } from './jobs'
 import { handleTranscribeJob } from './jobs'
-import '../db'
-import { db } from '../db'
 
 export class QueueManager {
   private static instance: QueueManager
@@ -30,8 +34,8 @@ export class QueueManager {
   }
 
   private setupProcessors = () => {
-    this.queue?.process('Transcribe', handleTranscribeJob, 1)
-    this.queue?.process('Export', handleExportJob, 1)
+    this.queue?.process('Transcribe', handleTranscribeJob as Processor, 1)
+    this.queue?.process('Export', handleExportJob as Processor, 1)
   }
 
   private setupEventListeners = () => {
@@ -52,18 +56,51 @@ export class QueueManager {
     this.pendingJobs.splice(0, this.pendingJobs.length)
   }
 
-  getJobList = (type: string) => {
-    return this.pendingJobs?.filter((job) => job.type === type) as QueueJob[]
+  getJobList = <T extends JobType>(type: string): SerializedJobForType<T>[] => {
+    return this.pendingJobs
+      ?.filter((job) => job.type === type)
+      .map((job) => {
+        const { type } = job
+
+        switch (type) {
+          case 'Transcribe': {
+            const data = job.data as TranscribeJobData
+
+            return {
+              id: job.id,
+              originalMediaFilePath: data.originalMediaFilePath
+            } as TranscribeListSerialized
+          }
+          case 'Export': {
+            const data = job.data as ExportJobData
+
+            return {
+              id: job.id,
+              originalMediaFilePath: data.originalMediaFilePath
+            } as ExportListSerialized
+          }
+          default:
+            throw new Error(`Unsupported job type: ${type}`)
+        }
+      }) as SerializedJobForType<T>[]
   }
 
-  queuePendingJobs = () => {
+  queuePendingJobs = (type?: JobType) => {
     for (const job of this.pendingJobs) {
+      if (type === 'Transcribe') {
+        this.queue?.addJob(job)
+        continue
+      }
+
+      if (type === 'Export') {
+        this.queue?.addJob(job)
+        continue
+      }
+
       this.queue?.addJob(job)
     }
 
-    // clear pending jobs
     this.pendingJobs.splice(0, this.pendingJobs.length)
-    // return queued jobs
   }
 
   createJob = async <T extends JobType>(type: T, data: JobDataForType<T>): Promise<void> => {
@@ -84,31 +121,36 @@ export class QueueManager {
     }
   }
 
-  getTranscribeOptions() {
-    return db.prepare('SELECT * FROM whisperconfig LIMIT 1').get() as WhisperInputConfig
-  }
+  createExportJob = async (data: ExportJobData) => {
+    const { originalMediaFilePath } = data
 
-  updateTranscribeOption(key: string, value: any) {
-    console.log(`[UPDATE] ${key}: ${value}`)
-    const stmt = db.prepare(`UPDATE whisperconfig SET ${key} = ? WHERE id = 1`)
-
-    // Convert boolean values to integers for SQLite storage
-    if (typeof value === 'boolean') {
-      value = value ? 1 : 0
+    const createNewJobData: CreateJobData = {
+      type: 'Export',
+      data: { originalMediaFilePath }
     }
 
-    stmt.run(value)
+    const now = new Date()
+
+    const job = new Job(
+      Object.assign({}, createNewJobData, {
+        queue: this.queue!,
+        id: uuid(),
+        createdAt: now,
+        updatedAt: now,
+        logs: [],
+        saved: false
+      })
+    )
+
+    this.pendingJobs.push(job)
   }
 
-  createExportJob = async (_data: ExportJobData) => {}
-
   createTranscribeJob = async (data: TranscribeJobData) => {
-    const { filePath } = data
-    const basename = path.basename(filePath)
+    const { originalMediaFilePath } = data
 
     const createNewJobData: CreateJobData = {
       type: 'Transcribe',
-      data: { filePath, fileName: basename }
+      data: { originalMediaFilePath } as TranscribeJobData
     }
 
     const now = new Date()

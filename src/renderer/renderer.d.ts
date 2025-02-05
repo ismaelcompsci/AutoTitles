@@ -7,8 +7,7 @@ import {
   SerializedJobForType,
   Subtitle,
   WhisperInputConfig,
-  WhisperParams,
-  WhisperResponse
+  ExportConfig
 } from '../shared/models'
 
 export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
@@ -25,10 +24,13 @@ interface QueueMangaerAPI {
   getJobList: <T extends JobType>(args: { type: T }) => Promise<SerializedJobForType<T>[]>
   getTranscribeOptions: () => Promise<WhisperInputConfig>
   updateTranscribeOptions: (args: { key: string; value: string }) => Promise<void>
-  queuePendingJobs: () => Promise<void>
+  queuePendingJobs: (type?: JobType) => Promise<void>
   clearQueue: () => Promise<void>
 
   onSubtitleAdded: (callback: (value: Subtitle) => void) => () => void
+
+  getExportOptions: () => Promise<ExportConfig>
+  updateExportOptions: (args: { key: string; value: string }) => Promise<void>
 }
 
 type DownloadCallback = (callback: (value: DownloadEvent) => void) => () => void

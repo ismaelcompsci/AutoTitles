@@ -17,14 +17,14 @@ export function App(): JSX.Element {
 
             {/* main */}
             <main className="isolate flex size-full overflow-hidden bg-background-200">
-              <div className="relative flex h-full bg-background-200">
+              <div className="relative flex h-full pr-2 bg-background-200">
                 <AppSidebar />
               </div>
 
               <MainView />
             </main>
 
-            <TailwindIndicator />
+            {/* <TailwindIndicator /> */}
             <Toaster richColors position="bottom-right" />
           </WavesurferProvider>
         </div>

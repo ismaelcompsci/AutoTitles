@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
+import path from 'path'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
@@ -83,3 +84,5 @@ export const scrollItemToCenter = (element: HTMLElement, container: HTMLElement)
 
   element.scrollIntoView({ block: 'center' })
 }
+
+export const getBasename = (file: string) => path.basename(file)

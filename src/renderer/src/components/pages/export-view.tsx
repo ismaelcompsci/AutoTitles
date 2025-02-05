@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Page } from '../ui/page'
 import { useAtom } from 'jotai'
 import { exportJobListAtom } from '@/state/state'
@@ -14,6 +14,8 @@ import {
 } from '../ui/select'
 import { ConfigSection } from '../common/config-section'
 import { ConfigItem } from '../common/config-item'
+import { ExportConfig } from 'src/shared/models'
+import { getBasename } from '@/lib/utils'
 
 const ExportOptions = [
   {
@@ -24,8 +26,15 @@ const ExportOptions = [
 
 export const ExportView = () => {
   const [exportJobList, setExportJobList] = useAtom(exportJobListAtom)
-  const job = exportJobList[0]
-  console.log(job)
+  const [exportOptions, setExportOptions] = useState<ExportConfig>()
+
+  const handleExport = async () => {
+    if (exportJobList.length) {
+      await window.api.queuePendingJobs('Export')
+    }
+
+    setExportJobList([])
+  }
 
   const getExportJobList = async () => {
     const exportJobList = await window.api.getJobList({ type: 'Export' })
@@ -35,32 +44,55 @@ export const ExportView = () => {
   }
 
   const handleFolderSelect = async () => {
-    await window.api.showOpenDialog({
+    const folder = await window.api.showOpenDialog({
       properties: ['createDirectory', 'openDirectory'],
       message: 'Choose a destination folder',
-      // defaultPath:
       buttonLabel: 'Select'
     })
+
+    const path = folder.filePaths[0]
+
+    updateExportOptions('folder', path)
   }
 
-  const getExportOptions = async () => {}
+  const updateExportOptions = async (key: string, value: string) => {
+    await window.api.updateExportOptions({ key, value }),
+      setExportOptions((p) => {
+        if (p) {
+          return { ...p, [key]: value }
+        }
+
+        return undefined
+      })
+  }
+
+  const getExportOptions = async () => {
+    const options = await window.api.getExportOptions()
+    setExportOptions(options)
+  }
 
   useEffect(() => {
     getExportJobList()
     getExportOptions()
   }, [])
 
+  const isDisabled =
+    exportJobList.length === 0 ||
+    !exportJobList ||
+    exportOptions?.folder === '' ||
+    exportOptions?.format === ''
+
   return (
     <Page.Root>
       <Page.Header>Export</Page.Header>
-      <Page.Body>
-        <div className="h-8" />
+      <Page.Body className="gap-12 flex flex-col pt-10 overflow-auto">
         <ConfigSection title="General">
           <ConfigItem label="Format" divider>
             <div className="grow" />
             <div>
               <Select
-              // value={format} onValueChange={setFormat}
+                value={exportOptions?.format}
+                onValueChange={(value) => updateExportOptions('format', value)}
               >
                 <SelectTrigger className="w-full border-none gap-1 max-w-[140px]">
                   <SelectValue placeholder="Select a format" />
@@ -85,8 +117,7 @@ export const ExportView = () => {
 
           <ConfigItem
             label="Export Folder"
-            // GET DEFAULT FOLDER
-            // sublabel={folder ? folder : downloadsFolder}
+            sublabel={exportOptions ? exportOptions.folder : undefined}
           >
             <div className="grow" />
 
@@ -100,6 +131,23 @@ export const ExportView = () => {
             </Button>
           </ConfigItem>
         </ConfigSection>
+
+        {exportJobList.length !== 0 && (
+          <ConfigSection title="Transcripts">
+            {exportJobList.map((job) => (
+              <ConfigItem key={job.id} label={'Transcribed'}>
+                <div className="grow" />
+                <p className="text-muted-foreground text-sm">
+                  {getBasename(job.originalMediaFilePath)}
+                </p>
+              </ConfigItem>
+            ))}
+          </ConfigSection>
+        )}
+
+        <Button onClick={handleExport} disabled={isDisabled}>
+          Export
+        </Button>
       </Page.Body>
     </Page.Root>
   )

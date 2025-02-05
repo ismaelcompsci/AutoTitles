@@ -21,14 +21,11 @@ export type WhisperResponse = {
 
 // Define the specific job data interfaces
 export interface TranscribeJobData {
-  filePath: string
-  fileName?: string
-  duration?: number
+  originalMediaFilePath: string
 }
 
 export interface ExportJobData {
-  exportPath?: string
-  filePath?: string
+  originalMediaFilePath: string
 }
 
 // Define the job types

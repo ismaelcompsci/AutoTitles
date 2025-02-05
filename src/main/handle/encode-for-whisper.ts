@@ -1,10 +1,12 @@
 import { randomUUID } from 'crypto'
 import { ffmpeg } from './ffmpeg'
-import { DEFAULT_DOWNLOADS_DIR } from './filesystem'
+import { app } from 'electron'
+
+const tmp = app.getPath('temp')
 
 // TODO STORE WAV FILES SOMEWHERE ELSE
 export const encodeForWhisper = async (inputFile: string) => {
-  const newFile = `${DEFAULT_DOWNLOADS_DIR}/${randomUUID()}.wav`
+  const newFile = `${tmp}/${randomUUID()}.wav`
 
   await new Promise((resolve, reject) => {
     ffmpeg()

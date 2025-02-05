@@ -23,7 +23,10 @@ export const IPCCHANNELS = {
   MODEL_MANAGER_DELETE_MODEL: 'modelManager.deleteModel',
   MODEL_MANAGER_SET_MODEL_LIST: 'modelManager.setModelList',
 
-  DIALOG_SHOW_MESSAGE_BOX: 'dialog.showMessageBox'
+  DIALOG_SHOW_MESSAGE_BOX: 'dialog.showMessageBox',
+
+  GET_EXPORT_OPTIONS: 'queue.getExportOptions',
+  UPDATE_EXPORT_OPTION: 'queue.updateExportOption'
 } as const
 
 export const MODELS = [

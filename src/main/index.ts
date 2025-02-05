@@ -7,14 +7,14 @@ import icon from '../../resources/icon.png?asset'
 import { DEFAULT_DOWNLOADS_DIR, getModelDownloadsFolder } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 import { QueueManager } from './queue/queue-manager'
-import { ExportJobData, JobType, TranscribeJobData } from '../shared/models'
-import { JobDataForType } from '../shared/models'
-import { initializeDefaultData } from './db'
+import { ConfigService } from './services/config-service'
 import { cancel, download } from './download-manager'
 import { deleteModel, getModelList } from './model-manager'
 import { showMessageBox, showOpenDialog } from './handle/dialog'
+import { JobDataForType, JobType } from '../shared/models'
 
 const appIcon = nativeImage.createFromPath(icon)
+const configService = ConfigService.getInstance()
 
 function createWindow(): void {
   // Create the browser window.
@@ -27,10 +27,9 @@ function createWindow(): void {
     minHeight: 150,
     frame: false,
     titleBarStyle: 'hidden',
-    /* You can use *titleBarOverlay: true* to use the original Windows controls */
     titleBarOverlay: true,
     ...(process.platform === 'linux' ? { icon } : {}),
-    trafficLightPosition: { x: 10, y: 10 },
+    trafficLightPosition: { x: 20, y: 12 },
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -75,6 +74,23 @@ app.whenReady().then(async () => {
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
   ipcMain.handle(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, showMessageBox)
 
+  // Config related handlers
+  ipcMain.handle(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS, () => {
+    return configService.getWhisperConfig()
+  })
+
+  ipcMain.handle(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, (_event, { key, value }) => {
+    return configService.updateWhisperConfig(key, value)
+  })
+
+  ipcMain.handle(IPCCHANNELS.GET_EXPORT_OPTIONS, () => {
+    return configService.getExportConfig()
+  })
+
+  ipcMain.handle(IPCCHANNELS.UPDATE_EXPORT_OPTION, (_event, { key, value }) => {
+    return configService.updateExportConfig(key, value)
+  })
+
   createWindow()
 
   if (!fs.existsSync(DEFAULT_DOWNLOADS_DIR)) {
@@ -103,7 +119,6 @@ app.on('window-all-closed', () => {
 setupQueueHandlers()
 setupDownloadManger()
 setupModelManager()
-initializeDefaultData()
 
 async function setupModelManager() {
   ipcMain.handle(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST, (_event) => {
@@ -133,56 +148,24 @@ async function setupQueueHandlers() {
   const queue = QueueManager.getInstance()
   await queue.init()
 
-  ipcMain.handle(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS, (_event) => {
-    return QueueManager.getInstance().getTranscribeOptions()
-  })
-
-  ipcMain.handle(IPCCHANNELS.UPDATE_TRANSCRIBE_OPTION, (_event, { key, value }) => {
-    return QueueManager.getInstance().updateTranscribeOption(key, value)
-  })
-
   ipcMain.handle(
     IPCCHANNELS.CREATE_JOB,
     <T extends JobType>(_event, args: { type: T; data: JobDataForType<T> }) => {
       const { type, data } = args
-      return QueueManager.getInstance().createJob(type, data)
+      return queue.createJob(type, data)
     }
   )
-  ipcMain.handle(IPCCHANNELS.QUEUE_PENDING_JOBS, () => {
-    return QueueManager.getInstance().queuePendingJobs()
+
+  ipcMain.handle(IPCCHANNELS.QUEUE_PENDING_JOBS, (_event, type?: JobType) => {
+    return queue.queuePendingJobs(type)
   })
 
   ipcMain.handle(IPCCHANNELS.GET_JOBLIST, <T extends JobType>(_event, args: { type: T }) => {
     const { type } = args
-    const jobs = QueueManager.getInstance().getJobList(type)
-
-    return jobs.map((job) => {
-      switch (type) {
-        case 'Transcribe': {
-          const data = job.data as TranscribeJobData
-
-          return {
-            id: job.id,
-            fileName: data.fileName,
-            duration: data.duration,
-            filePath: data.filePath
-          }
-        }
-        case 'Export': {
-          const data = job.data as ExportJobData
-
-          return {
-            id: job.id,
-            filePath: data.filePath
-          }
-        }
-        default:
-          throw new Error(`Unsupported job type: ${type}`)
-      }
-    })
+    return queue.getJobList(type)
   })
 
   ipcMain.handle(IPCCHANNELS.QUEUE_CLEAR, () => {
-    return QueueManager.getInstance().clear()
+    return queue.clear()
   })
 }
