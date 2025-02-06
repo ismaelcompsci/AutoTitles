@@ -7,7 +7,11 @@ import {
   SerializedJobForType,
   Subtitle,
   WhisperInputConfig,
-  ExportConfig
+  ExportConfig,
+  QueueProgress,
+  ExportCompleted,
+  TranscribeListSerialized,
+  ExportListSerialized
 } from '../shared/models'
 
 export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
@@ -16,7 +20,10 @@ export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
   showMessageBox: (options: Electron.MessageBoxOptions) => Promise<Electron.MessageBoxReturnValue>
   getModelList: () => Promise<ModelCategory[]>
   deleteModel: (modelName: string) => Promise<void>
+  showItemInFilesystem: (path: string) => Promise<void>
+
   onModelListUpdated: (callback: (models: ModelCategory[]) => void) => () => void
+  onExportCompleted: (callback: (data: ExportCompleted) => void) => () => void
 }
 
 interface QueueMangaerAPI {
@@ -28,6 +35,11 @@ interface QueueMangaerAPI {
   clearQueue: () => Promise<void>
 
   onSubtitleAdded: (callback: (value: Subtitle) => void) => () => void
+  onQueueProgress: (callback: (value: QueueProgress) => void) => () => void
+  onQueueSetRunning: (callback: (value: boolean) => void) => () => void
+  onQueueSetJobList: (
+    callback: (list: (TranscribeListSerialized | ExportListSerialized)[]) => void
+  ) => () => void
 
   getExportOptions: () => Promise<ExportConfig>
   updateExportOptions: (args: { key: string; value: string }) => Promise<void>

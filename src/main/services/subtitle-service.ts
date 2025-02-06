@@ -19,14 +19,8 @@ export class SubtitleService {
   }
 
   removeAll() {
-    console.log('[SubtitleService] clearing subtitle table...')
-    this.dbService
-      .getDatabase()
-      .prepare(
-        `DELETE FROM sub
-      titles`
-      )
-      .run()
+    console.log('[SubtitleService] clearing subtitles table...')
+    this.dbService.getDatabase().prepare(`DELETE FROM subtitles`).run()
     this.dbService
       .getDatabase()
       .prepare(`UPDATE sqlite_sequence SET seq=1 WHERE name=?`)

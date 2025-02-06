@@ -8,6 +8,7 @@ import os from 'node:os'
 import { decode } from 'node-wav'
 import { SubtitleService } from '../services/subtitle-service'
 import { ConfigService } from '../services/config-service'
+import { IPCCHANNELS } from '../../shared/constants'
 
 const root = path.join(os.homedir(), '.autotitles')
 const models = path.join(root, 'models')
@@ -18,8 +19,9 @@ const subtitleService = SubtitleService.getInstance()
 const configService = ConfigService.getInstance()
 
 export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => {
+  await job.setProgress(0, 100)
   const { data } = job
-  const { originalMediaFilePath } = data
+  const { originalMediaFilePath, duration } = data
   const basename = path.basename(originalMediaFilePath)
   console.log('[handleTranscribeJob] starting', basename)
 
@@ -27,20 +29,26 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
 
   const whisper = new Whisper(modelPath, { gpu: true })
   const pcm = read_wav(encodedFilePath)
+  await job.setProgress(25, 100)
 
   const config = configService.getWhisperConfig()
   const task = await whisper.transcribe(pcm, {
     suppress_non_speech_tokens: true,
-    ...config
+    ...config,
+    print_progress: false,
+    print_realtime: false,
+    print_special: false,
+    print_timestamps: false,
+    debug_mode: false
   })
 
+  const durationInMilliseconds = duration * 1000
   let index = 0
   task.on('transcribed', (subtitle) => {
     const id = `id-${subtitle.from}-${subtitle.to}`
-    console.log({ id, ...subtitle })
 
     const window = BrowserWindow.getFocusedWindow()
-    window?.webContents.send('segments:segment-added', {
+    window?.webContents.send(IPCCHANNELS.SUBTITLE_ADDED, {
       id,
       start: subtitle.from,
       end: subtitle.to,
@@ -57,13 +65,19 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
     })
 
     index += 1
+
+    const transcriptionProgress = 50 + Math.min((subtitle.to / durationInMilliseconds) * 49, 49)
+    job.setProgress(Math.round(transcriptionProgress), 100)
   })
 
+  await task.result
   await whisper.free()
+
   fs.rmSync(encodedFilePath)
+  await job.setProgress(100, 100)
 }
 
-export const handleExportJob = async (job: ExportJob): Promise<void> => {
+export const handleExportJob = async (job: ExportJob): Promise<string> => {
   const { originalMediaFilePath } = job.data
   const basename = path.basename(originalMediaFilePath)
   console.log('[handleExportJob] starting ', basename)
@@ -90,6 +104,7 @@ export const handleExportJob = async (job: ExportJob): Promise<void> => {
   fs.writeFileSync(outputPath, content, 'utf-8')
 
   subtitleService.removeAll()
+  return outputPath
 }
 
 /**

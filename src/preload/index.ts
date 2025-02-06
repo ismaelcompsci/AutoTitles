@@ -21,6 +21,7 @@ const api: IAPI = {
   clearQueue: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_CLEAR),
   getExportOptions: () => ipcRenderer.invoke(IPCCHANNELS.GET_EXPORT_OPTIONS),
   updateExportOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_EXPORT_OPTION, args),
+  showItemInFilesystem: (file) => ipcRenderer.invoke(IPCCHANNELS.SHOW_FILE_IN_FILESYSTEM, file),
 
   // main -> renderer
   onDownloadStarted: (callback) => {
@@ -73,10 +74,40 @@ const api: IAPI = {
   },
   onSubtitleAdded: (callback) => {
     const subscription = (_event, value) => callback(value)
-    ipcRenderer.on('segments:segment-added', subscription)
+    ipcRenderer.on(IPCCHANNELS.SUBTITLE_ADDED, subscription)
 
     return () => {
-      ipcRenderer.removeListener('segments:segment-added', subscription)
+      ipcRenderer.removeListener(IPCCHANNELS.SUBTITLE_ADDED, subscription)
+    }
+  },
+  onQueueProgress: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.QUEUE_PROGRESS, subscription)
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.QUEUE_PROGRESS, subscription)
+    }
+  },
+  onExportCompleted: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.EXPORT_COMPLETED, subscription)
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.EXPORT_COMPLETED, subscription)
+    }
+  },
+  onQueueSetRunning: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.QUEUE_SET_RUNNING, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.QUEUE_SET_RUNNING, subscription)
+    }
+  },
+  onQueueSetJobList: (callback) => {
+    const subscription = (_event, value) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.QUEUE_SET_JOBLIST, subscription)
+
+    return () => {
+      ipcRenderer.removeListener(IPCCHANNELS.QUEUE_SET_JOBLIST, subscription)
     }
   },
   onModelListUpdated: (callback) => {

@@ -1,6 +1,7 @@
 export const IPCCHANNELS = {
   FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER: 'filesystem:getDownloadsFolder',
   FILESYSTEM_CHOOSE_FOLDER: 'dialog.showOpenDialog',
+  SHOW_FILE_IN_FILESYSTEM: 'filesystem.showItemInFilesystem',
 
   CREATE_JOB: 'queue.createJob',
   GET_JOBLIST: 'queue.getJobList',
@@ -8,6 +9,11 @@ export const IPCCHANNELS = {
   GET_TRANSCRIBE_OPTIONS: 'queue.getTranscribeOptions',
   UPDATE_TRANSCRIBE_OPTION: 'queue.updateTranscribeOption',
   QUEUE_CLEAR: 'queue.clear',
+  QUEUE_SET_RUNNING: 'queue.setIsRunning',
+  QUEUE_SET_JOBLIST: 'queue.setJobList',
+  QUEUE_PROGRESS: 'queue.progress',
+
+  EXPORT_COMPLETED: 'export.completed',
 
   DOWNLOAD_MANAGER_DOWNLOAD: 'downloadManager.download',
   DOWNLOAD_MANAGER_CANCEL: 'downloadManager.cancel',
@@ -26,7 +32,8 @@ export const IPCCHANNELS = {
   DIALOG_SHOW_MESSAGE_BOX: 'dialog.showMessageBox',
 
   GET_EXPORT_OPTIONS: 'queue.getExportOptions',
-  UPDATE_EXPORT_OPTION: 'queue.updateExportOption'
+  UPDATE_EXPORT_OPTION: 'queue.updateExportOption',
+  SUBTITLE_ADDED: 'subtitle:subtitle-added'
 } as const
 
 export const MODELS = [

@@ -73,6 +73,9 @@ app.whenReady().then(async () => {
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER, getModelDownloadsFolder)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
   ipcMain.handle(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, showMessageBox)
+  ipcMain.handle(IPCCHANNELS.SHOW_FILE_IN_FILESYSTEM, (_event, file: string) =>
+    shell.showItemInFolder(file)
+  )
 
   // Config related handlers
   ipcMain.handle(IPCCHANNELS.GET_TRANSCRIBE_OPTIONS, () => {

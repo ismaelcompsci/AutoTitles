@@ -1,12 +1,10 @@
 import EmbeddedQueue, { CreateJobData, Job, Processor } from 'embedded-queue'
 import { v4 as uuid } from 'uuid'
 import {
-  ExportConfig,
   ExportListSerialized,
   QueueJob,
   SerializedJobForType,
-  TranscribeListSerialized,
-  WhisperInputConfig
+  TranscribeListSerialized
 } from '../../shared/models'
 import { ExportJobData, TranscribeJobData } from '../../shared/models'
 import { JobType } from '../../shared/models'
@@ -14,6 +12,8 @@ import { JobDataForType } from '../../shared/models'
 
 import { handleExportJob } from './jobs'
 import { handleTranscribeJob } from './jobs'
+import { BrowserWindow } from 'electron'
+import { IPCCHANNELS } from '../../shared/constants'
 
 export class QueueManager {
   private static instance: QueueManager
@@ -39,8 +39,34 @@ export class QueueManager {
   }
 
   private setupEventListeners = () => {
-    this.queue?.on(EmbeddedQueue.Event.Enqueue, (job) => {
-      console.log(job)
+    this.queue?.on(EmbeddedQueue.Event.Start, () => {
+      const window = BrowserWindow.getFocusedWindow()
+      window?.webContents.send(IPCCHANNELS.QUEUE_SET_RUNNING, true)
+    })
+
+    this.queue?.on(EmbeddedQueue.Event.Complete, (job: QueueJob, result) => {
+      const window = BrowserWindow.getFocusedWindow()
+      window?.webContents.send(IPCCHANNELS.QUEUE_SET_RUNNING, false)
+
+      if (job.type === 'Export') {
+        const data = {
+          outputPath: result
+        }
+
+        window?.webContents.send(IPCCHANNELS.EXPORT_COMPLETED, data)
+      }
+    })
+
+    this.queue?.on(EmbeddedQueue.Event.Progress, (job: QueueJob, progress: number) => {
+      const window = BrowserWindow.getFocusedWindow()
+      const data = {
+        id: job.id,
+        type: job.type,
+        progress: progress,
+        file: job.data.originalMediaFilePath
+      }
+
+      window?.webContents.send(IPCCHANNELS.QUEUE_PROGRESS, data)
     })
   }
 
@@ -119,14 +145,15 @@ export class QueueManager {
       console.error(`Failed to create ${type} job:`, error)
       throw error
     }
+
+    const window = BrowserWindow.getFocusedWindow()
+    window?.webContents.send(IPCCHANNELS.QUEUE_SET_JOBLIST, type, this.getJobList(type))
   }
 
   createExportJob = async (data: ExportJobData) => {
-    const { originalMediaFilePath } = data
-
     const createNewJobData: CreateJobData = {
       type: 'Export',
-      data: { originalMediaFilePath }
+      data: data
     }
 
     const now = new Date()
@@ -146,11 +173,9 @@ export class QueueManager {
   }
 
   createTranscribeJob = async (data: TranscribeJobData) => {
-    const { originalMediaFilePath } = data
-
     const createNewJobData: CreateJobData = {
       type: 'Transcribe',
-      data: { originalMediaFilePath } as TranscribeJobData
+      data: data
     }
 
     const now = new Date()

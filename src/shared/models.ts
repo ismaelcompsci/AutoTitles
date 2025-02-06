@@ -22,6 +22,10 @@ export type WhisperResponse = {
 // Define the specific job data interfaces
 export interface TranscribeJobData {
   originalMediaFilePath: string
+  /**
+   * duration of media in seconds
+   */
+  duration: number
 }
 
 export interface ExportJobData {
@@ -119,4 +123,15 @@ export type ModelItem = {
 export type ModelCategory = {
   id: string
   items: ModelItem[]
+}
+
+export type QueueProgress = {
+  id: string
+  type: JobType
+  progress: number
+  file: string
+}
+
+export type ExportCompleted = {
+  outputPath: string
 }

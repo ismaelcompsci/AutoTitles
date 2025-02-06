@@ -28,17 +28,22 @@ export const Waveform = () => {
   useEffect(() => {
     if (!ws) return
 
-    // TODO FIGURE OUT HOW TO REMOVE LISTENER
-    window.api.onSubtitleAdded((sub) => {
-      if (!subtitlesById[sub.id]) {
-        subtitlesById[sub.id] = sub
-        subtitles.push(sub)
+    const subs = [
+      window.api.onSubtitleAdded((sub) => {
+        if (!subtitlesById[sub.id]) {
+          subtitlesById[sub.id] = sub
+          subtitles.push(sub)
 
-        setSubtitles([...subtitles])
-        setSubtitlesById({ ...subtitlesById })
-        addRegion(sub)
-      }
-    })
+          setSubtitles([...subtitles])
+          setSubtitlesById({ ...subtitlesById })
+          addRegion(sub)
+        }
+      })
+    ]
+
+    return () => {
+      subs.forEach((s) => s())
+    }
   }, [ws])
 
   return (

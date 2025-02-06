@@ -1,6 +1,6 @@
 import { AudioLines, Paperclip } from 'lucide-react'
 import { Button } from '../ui/button'
-import { supportedFormats } from '@/lib/utils'
+import { getMediaDuration, supportedFormats } from '@/lib/utils'
 import { useSetAtom } from 'jotai'
 import { pageAtom, transcribeJobListAtom } from '@/state/state'
 import { Page } from '../ui/page'
@@ -17,10 +17,13 @@ export const HomeView = () => {
     })
 
     const filePath = filePaths[0]
+    const media = `file://${filePath}`
+
+    const duration = await getMediaDuration(media)
 
     if (filePath) {
       await window.api.createJob({
-        data: { originalMediaFilePath: `file://${filePath}` },
+        data: { originalMediaFilePath: media, duration: duration },
         type: 'Transcribe'
       })
 

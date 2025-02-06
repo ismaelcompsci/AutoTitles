@@ -86,3 +86,21 @@ export const scrollItemToCenter = (element: HTMLElement, container: HTMLElement)
 }
 
 export const getBasename = (file: string) => path.basename(file)
+
+export const getMediaDuration = (mediaUrl: string): Promise<number> => {
+  return new Promise((resolve, reject) => {
+    const media = document.createElement('video') // Works for both video and audio
+    media.src = mediaUrl
+    media.preload = 'metadata'
+
+    media.onloadedmetadata = () => {
+      resolve(media.duration)
+      media.remove() // Clean up
+    }
+
+    media.onerror = () => {
+      reject(new Error('Failed to load media'))
+      media.remove() // Clean up
+    }
+  })
+}

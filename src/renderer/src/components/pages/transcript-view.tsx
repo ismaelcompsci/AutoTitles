@@ -4,10 +4,9 @@ import { SubtitleList } from '../transcript/subtitle-list'
 import { Waveform } from '../transcript/waveform'
 import { ResizablePanel } from '../common/resizeable-panel'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { audioURLAtom, pageAtom, transcribeJobListAtom } from '@/state/state'
+import { audioURLAtom, pageAtom } from '@/state/state'
 import { Button } from '../ui/button'
 import { ArrowRight } from 'lucide-react'
-import { TranscribeListSerialized } from 'src/shared/models'
 import { getBasename } from '@/lib/utils'
 
 export const TranscriptView = () => {

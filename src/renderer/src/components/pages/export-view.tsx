@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Page } from '../ui/page'
-import { useAtom } from 'jotai'
-import { exportJobListAtom } from '@/state/state'
+import { useAtom, useSetAtom } from 'jotai'
+import { audioURLAtom, exportJobListAtom, subtitlesAtom, subtitlesByIdAtom } from '@/state/state'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -16,6 +16,7 @@ import { ConfigSection } from '../common/config-section'
 import { ConfigItem } from '../common/config-item'
 import { ExportConfig } from 'src/shared/models'
 import { getBasename } from '@/lib/utils'
+import { toast } from 'sonner'
 
 const ExportOptions = [
   {
@@ -27,6 +28,9 @@ const ExportOptions = [
 export const ExportView = () => {
   const [exportJobList, setExportJobList] = useAtom(exportJobListAtom)
   const [exportOptions, setExportOptions] = useState<ExportConfig>()
+  const setAudioUrl = useSetAtom(audioURLAtom)
+  const setSubtitles = useSetAtom(subtitlesAtom)
+  const setSubtitlesById = useSetAtom(subtitlesByIdAtom)
 
   const handleExport = async () => {
     if (exportJobList.length) {
@@ -34,6 +38,9 @@ export const ExportView = () => {
     }
 
     setExportJobList([])
+    setAudioUrl(null)
+    setSubtitles([])
+    setSubtitlesById({})
   }
 
   const getExportJobList = async () => {
@@ -74,6 +81,25 @@ export const ExportView = () => {
   useEffect(() => {
     getExportJobList()
     getExportOptions()
+
+    const subs = [
+      window.api.onExportCompleted((data) => {
+        toast(`${getBasename(data.outputPath)} export completed!`, {
+          action: {
+            label: 'Open',
+            onClick: () => window.api.showItemInFilesystem(data.outputPath)
+          },
+          cancel: {
+            label: 'Cancel',
+            onClick: () => {}
+          }
+        })
+      })
+    ]
+
+    return () => {
+      subs.forEach((s) => s())
+    }
   }, [])
 
   const isDisabled =
