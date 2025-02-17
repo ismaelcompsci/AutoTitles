@@ -171,4 +171,8 @@ async function setupQueueHandlers() {
   ipcMain.handle(IPCCHANNELS.QUEUE_CLEAR, () => {
     return queue.clear()
   })
+
+  ipcMain.handle(IPCCHANNELS.QUEUE_ABORT_RUNNING_JOB, () => {
+    return queue.abortRunningJob()
+  })
 }

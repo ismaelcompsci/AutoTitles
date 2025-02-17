@@ -80,12 +80,11 @@ export function AppSidebar() {
 export const HistoryControls = () => {
   const { undo, canRedo, redo, canUndo } = useAtomValue(pageHistory)
   return (
-    <>
+    <div className="flex flex-items items-center">
       <Button
-        className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
+        className="text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
         disabled={!canUndo}
         size={'tiny'}
-        shape="square"
         variant={'tertiary'}
         onClick={undo}
       >
@@ -93,15 +92,14 @@ export const HistoryControls = () => {
       </Button>
 
       <Button
-        className="px-0 text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
+        className="text-muted-foreground disabled:text-muted drag-none disabled:bg-background-200 disabled:border-none"
         size={'tiny'}
-        shape="square"
         disabled={!canRedo}
         variant={'tertiary'}
         onClick={redo}
       >
         <ArrowRightIcon className="h-4 w-4 text-muted" />
       </Button>
-    </>
+    </div>
   )
 }

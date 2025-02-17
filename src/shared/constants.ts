@@ -12,6 +12,7 @@ export const IPCCHANNELS = {
   QUEUE_SET_RUNNING: 'queue.setIsRunning',
   QUEUE_SET_JOBLIST: 'queue.setJobList',
   QUEUE_PROGRESS: 'queue.progress',
+  QUEUE_ABORT_RUNNING_JOB: 'queue.abortRunningJob',
 
   EXPORT_COMPLETED: 'export.completed',
 

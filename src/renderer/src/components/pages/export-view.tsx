@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Page } from '../ui/page'
 import { useAtom, useSetAtom } from 'jotai'
-import { audioURLAtom, exportJobListAtom, subtitlesAtom, subtitlesByIdAtom } from '@/state/state'
+import {
+  audioURLAtom,
+  exportJobListAtom,
+  pageAtom,
+  subtitlesAtom,
+  subtitlesByIdAtom
+} from '@/state/state'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -28,9 +34,14 @@ const ExportOptions = [
 export const ExportView = () => {
   const [exportJobList, setExportJobList] = useAtom(exportJobListAtom)
   const [exportOptions, setExportOptions] = useState<ExportConfig>()
-  const setAudioUrl = useSetAtom(audioURLAtom)
+  const [audioURL, setAudioUrl] = useAtom(audioURLAtom)
   const setSubtitles = useSetAtom(subtitlesAtom)
   const setSubtitlesById = useSetAtom(subtitlesByIdAtom)
+  const setPage = useSetAtom(pageAtom)
+
+  const handleStartOver = () => {
+    setPage('home')
+  }
 
   const handleExport = async () => {
     if (exportJobList.length) {
@@ -171,9 +182,13 @@ export const ExportView = () => {
           </ConfigSection>
         )}
 
-        <Button onClick={handleExport} disabled={isDisabled}>
-          Export
-        </Button>
+        {audioURL ? (
+          <Button onClick={handleExport} disabled={isDisabled}>
+            Export
+          </Button>
+        ) : (
+          <Button onClick={handleStartOver}>Go Home</Button>
+        )}
       </Page.Body>
     </Page.Root>
   )

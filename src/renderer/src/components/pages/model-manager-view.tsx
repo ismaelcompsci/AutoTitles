@@ -165,7 +165,7 @@ export const ModelManagerView = () => {
   )
 }
 
-export const ModelIcon = ({ model }: { model: ModelItem }) => {
+export const ModelIcon = ({ model, className }: { model: ModelItem; className?: string }) => {
   const color = {
     multilingual: 'bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500',
     english: 'bg-gradient-to-r from-cyan-700 via-blue-500 to-indigo-600'
@@ -173,8 +173,17 @@ export const ModelIcon = ({ model }: { model: ModelItem }) => {
 
   const iconColor = color[model.type]
   return (
-    <div className={cn('p-2 rounded-md', iconColor)}>
-      <Component />
+    <div
+      className={cn(
+        'p-1.5 rounded-md',
+        'bg-white/5',
+        'group-hover:bg-white/10',
+        'transition-colors duration-200',
+        iconColor,
+        className
+      )}
+    >
+      <Component className="size-full" />
     </div>
   )
 }

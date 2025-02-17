@@ -43,6 +43,7 @@ interface QueueMangaerAPI {
 
   getExportOptions: () => Promise<ExportConfig>
   updateExportOptions: (args: { key: string; value: string }) => Promise<void>
+  abortRunningJob: () => Promise<boolean>
 }
 
 type DownloadCallback = (callback: (value: DownloadEvent) => void) => () => void

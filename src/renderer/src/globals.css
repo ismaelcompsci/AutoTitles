@@ -604,7 +604,7 @@ html {
     line-height: 17px;
     padding: 4px 8px .25rem;
 }
-
+/* 
 #waveform ::part(region-handle) {
 }
 
@@ -615,4 +615,4 @@ html {
 }
 
 #waveform ::part(region-handle-right) {
-}
+} */

@@ -10,6 +10,8 @@ export const HomeView = () => {
   const setTranscribeJobList = useSetAtom(transcribeJobListAtom)
 
   const handleClick = async () => {
+    await window.api.clearQueue()
+
     const { filePaths } = await window.api.showOpenDialog({
       message: 'Select and Audio or Video file to transcribe',
       properties: ['openFile', 'createDirectory'],

@@ -4,7 +4,7 @@ import { SubtitleList } from '../transcript/subtitle-list'
 import { Waveform } from '../transcript/waveform'
 import { ResizablePanel } from '../common/resizeable-panel'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { audioURLAtom, pageAtom } from '@/state/state'
+import { audioURLAtom, jobIsRunningAtom, pageAtom } from '@/state/state'
 import { Button } from '../ui/button'
 import { ArrowRight } from 'lucide-react'
 import { getBasename } from '@/lib/utils'
@@ -48,6 +48,7 @@ export const TopPanel = () => {
 const TranscriptHeader = () => {
   const setPage = useSetAtom(pageAtom)
   const currentFile = useAtomValue(audioURLAtom)
+  const jobIsRunning = useAtomValue(jobIsRunningAtom)
 
   const handleStartExport = async () => {
     if (!currentFile) return
@@ -68,6 +69,7 @@ const TranscriptHeader = () => {
           <div className="absolute inset-y-0 right-0 flex items-center px-2">
             <Button
               size={'tiny'}
+              disabled={jobIsRunning}
               variant={'secondary'}
               suffix={<ArrowRight className="w-4 h-4 mr-1 " />}
               onClick={handleStartExport}

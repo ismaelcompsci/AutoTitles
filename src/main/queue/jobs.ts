@@ -1,3 +1,4 @@
+import EmbeddedQueue from 'embedded-queue'
 import fs from 'fs'
 import { Whisper } from 'smart-whisper'
 import path from 'path'
@@ -19,62 +20,69 @@ const subtitleService = SubtitleService.getInstance()
 const configService = ConfigService.getInstance()
 
 export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => {
-  await job.setProgress(0, 100)
-  const { data } = job
-  const { originalMediaFilePath, duration } = data
-  const basename = path.basename(originalMediaFilePath)
-  console.log('[handleTranscribeJob] starting', basename)
+  try {
+    await job.setProgress(0, 100)
+    const { data } = job
+    const { originalMediaFilePath, duration } = data
+    const basename = path.basename(originalMediaFilePath)
+    console.log('[handleTranscribeJob] starting', basename)
 
-  const encodedFilePath = await encodeForWhisper(originalMediaFilePath)
+    const encodedFilePath = await encodeForWhisper(originalMediaFilePath)
 
-  const whisper = new Whisper(modelPath, { gpu: true })
-  const pcm = read_wav(encodedFilePath)
-  await job.setProgress(25, 100)
+    const whisper = new Whisper(modelPath, { gpu: true })
+    const pcm = read_wav(encodedFilePath)
+    await job.setProgress(25, 100)
 
-  const config = configService.getWhisperConfig()
-  const task = await whisper.transcribe(pcm, {
-    suppress_non_speech_tokens: true,
-    ...config,
-    print_progress: false,
-    print_realtime: false,
-    print_special: false,
-    print_timestamps: false,
-    debug_mode: false
-  })
-
-  const durationInMilliseconds = duration * 1000
-  let index = 0
-  task.on('transcribed', (subtitle) => {
-    const id = `id-${subtitle.from}-${subtitle.to}`
-
-    const window = BrowserWindow.getFocusedWindow()
-    window?.webContents.send(IPCCHANNELS.SUBTITLE_ADDED, {
-      id,
-      start: subtitle.from,
-      end: subtitle.to,
-      text: subtitle.text
+    const config = configService.getWhisperConfig()
+    const task = await whisper.transcribe(pcm, {
+      suppress_non_speech_tokens: true,
+      ...config,
+      print_progress: false,
+      print_realtime: false,
+      print_special: false,
+      print_timestamps: false,
+      debug_mode: false
     })
 
-    subtitleService.insertSubtitle({
-      fileName: basename,
-      segmentIndex: index,
-      segmentText: subtitle.text,
-      startTime: subtitle.from,
-      endTime: subtitle.to,
-      duration: subtitle.to - subtitle.from
+    const durationInMilliseconds = duration * 1000
+    let index = 0
+
+    task.on('transcribed', (subtitle) => {
+      if (job.state !== EmbeddedQueue.State.ACTIVE) return
+
+      const id = `id-${subtitle.from}-${subtitle.to}`
+
+      const window = BrowserWindow.getFocusedWindow()
+      window?.webContents.send(IPCCHANNELS.SUBTITLE_ADDED, {
+        id,
+        start: subtitle.from,
+        end: subtitle.to,
+        text: subtitle.text
+      })
+
+      subtitleService.insertSubtitle({
+        fileName: basename,
+        segmentIndex: index,
+        segmentText: subtitle.text,
+        startTime: subtitle.from,
+        endTime: subtitle.to,
+        duration: subtitle.to - subtitle.from
+      })
+
+      index += 1
+
+      const transcriptionProgress = 50 + Math.min((subtitle.to / durationInMilliseconds) * 49, 49)
+      job.setProgress(Math.round(transcriptionProgress), 100)
     })
 
-    index += 1
+    await task.result
+    await whisper.free()
 
-    const transcriptionProgress = 50 + Math.min((subtitle.to / durationInMilliseconds) * 49, 49)
-    job.setProgress(Math.round(transcriptionProgress), 100)
-  })
-
-  await task.result
-  await whisper.free()
-
-  fs.rmSync(encodedFilePath)
-  await job.setProgress(100, 100)
+    fs.rmSync(encodedFilePath)
+    await job.setProgress(100, 100)
+  } catch (e) {
+    console.log('[handleTranscribeJob] Error: ', e)
+  }
 }
 
 export const handleExportJob = async (job: ExportJob): Promise<string> => {

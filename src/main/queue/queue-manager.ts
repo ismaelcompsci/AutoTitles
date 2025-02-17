@@ -57,6 +57,19 @@ export class QueueManager {
       }
     })
 
+    this.queue?.on(EmbeddedQueue.Event.Failure, (job: QueueJob, _error) => {
+      console.log('EmbeddedQueue.Event.Failure', job.type, job.id)
+
+      const window = BrowserWindow.getFocusedWindow()
+      window?.webContents.send(IPCCHANNELS.QUEUE_SET_RUNNING, false)
+    })
+    this.queue?.on(EmbeddedQueue.Event.Remove, (job: QueueJob) => {
+      console.log('EmbeddedQueue.Event.Remove', job.type, job.id)
+
+      const window = BrowserWindow.getFocusedWindow()
+      window?.webContents.send(IPCCHANNELS.QUEUE_SET_RUNNING, false)
+    })
+
     this.queue?.on(EmbeddedQueue.Event.Progress, (job: QueueJob, progress: number) => {
       const window = BrowserWindow.getFocusedWindow()
       const data = {
@@ -68,6 +81,19 @@ export class QueueManager {
 
       window?.webContents.send(IPCCHANNELS.QUEUE_PROGRESS, data)
     })
+  }
+
+  abortRunningJob = async () => {
+    try {
+      await this.queue?.shutdown(100, 'Transcribe')
+
+      this.setupProcessors()
+
+      return true
+    } catch (e) {
+      console.log('[abortRunningJob] Error', e)
+      return false
+    }
   }
 
   clear = async () => {
@@ -111,15 +137,16 @@ export class QueueManager {
       }) as SerializedJobForType<T>[]
   }
 
-  queuePendingJobs = (type?: JobType) => {
+  queuePendingJobs = async (type?: JobType) => {
+    console.log(type, this.pendingJobs)
     for (const job of this.pendingJobs) {
       if (type === 'Transcribe') {
-        this.queue?.addJob(job)
+        await this.queue?.addJob(job)
         continue
       }
 
       if (type === 'Export') {
-        this.queue?.addJob(job)
+        await this.queue?.addJob(job)
         continue
       }
 

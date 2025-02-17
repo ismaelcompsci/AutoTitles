@@ -1,6 +1,7 @@
 import { atom } from 'jotai'
 import {
   ExportListSerialized,
+  QueueProgress,
   Subtitle,
   TranscribeListSerialized,
   WhisperInputConfig
@@ -13,6 +14,8 @@ export const pageAtom = atom<Page>('home')
 export const pageHistory = withUndo<Page>(pageAtom, 10)
 export const mainContainerRefAtom = atom<HTMLDivElement | null>(null)
 
+export const jobProgressAtom = atom<QueueProgress | null>()
+export const jobIsRunningAtom = atom<boolean>(false)
 export const transcribeJobListAtom = atom<TranscribeListSerialized[]>([])
 export const exportJobListAtom = atom<ExportListSerialized[]>([])
 export const subtitlesAtom = atom<Subtitle[]>([])
