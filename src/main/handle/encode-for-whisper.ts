@@ -27,5 +27,3 @@ export const encodeForWhisper = async (inputFile: string) => {
 
   return newFile
 }
-
-export const extractAudio = async () => {}

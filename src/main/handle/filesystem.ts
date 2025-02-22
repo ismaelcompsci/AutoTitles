@@ -1,9 +1,5 @@
 import { app } from 'electron'
 import path from 'path'
-import { modelsDir } from '../model-manager'
+import os from 'os'
 
 export const DEFAULT_DOWNLOADS_DIR = path.join(app.getPath('downloads'))
-
-export const getModelDownloadsFolder = () => {
-  return modelsDir
-}

@@ -25,9 +25,11 @@ function createWindow(): void {
     height: 728,
     minWidth: 250,
     minHeight: 150,
-    frame: false,
     titleBarStyle: 'hidden',
     titleBarOverlay: true,
+    frame: false,
+    visualEffectState: 'active',
+    vibrancy: 'sidebar',
     ...(process.platform === 'linux' ? { icon } : {}),
     trafficLightPosition: { x: 20, y: 12 },
     webPreferences: {

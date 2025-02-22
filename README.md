@@ -19,6 +19,9 @@ $ npm install
 $ npm run dev
 ```
 TODO
-- clean up generated audio files
-- add error state to task
-    - handle error state
+- Implement detail whisper.cpp captions
+    ```
+        token_timestamps: true,
+        format: 'detail'
+    ```
+

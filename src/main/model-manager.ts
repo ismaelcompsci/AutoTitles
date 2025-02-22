@@ -3,7 +3,6 @@ import fs from 'node:fs'
 import os from 'node:os'
 import { ModelCategory } from '../shared/models'
 import { modelSizes } from '../shared/constants'
-import { getModelDownloadsFolder } from './handle/filesystem'
 
 const root = path.join(os.homedir(), '.autotitles')
 export const modelsDir = path.join(root, 'models')
@@ -13,7 +12,6 @@ const ext = '.bin'
 fs.mkdirSync(modelsDir, { recursive: true })
 
 export async function deleteModel(model: string) {
-  const modelsDir = getModelDownloadsFolder()
   const modelPath = path.join(modelsDir, `ggml-${model}.bin`)
 
   try {

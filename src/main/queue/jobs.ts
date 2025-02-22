@@ -5,16 +5,11 @@ import path from 'path'
 import { ExportJob, Subtitle, TranscribeJob } from '../../shared/models'
 import { BrowserWindow } from 'electron'
 import { encodeForWhisper } from '../handle/encode-for-whisper'
-import os from 'node:os'
 import { decode } from 'node-wav'
 import { SubtitleService } from '../services/subtitle-service'
 import { ConfigService } from '../services/config-service'
 import { IPCCHANNELS } from '../../shared/constants'
-
-const root = path.join(os.homedir(), '.autotitles')
-const models = path.join(root, 'models')
-const filename = `ggml-tiny.en.bin`
-const modelPath = path.join(models, filename)
+import { modelsDir } from '../model-manager'
 
 const subtitleService = SubtitleService.getInstance()
 const configService = ConfigService.getInstance()
@@ -24,24 +19,27 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
     await job.setProgress(0, 100)
     const { data } = job
     const { originalMediaFilePath, duration } = data
-    const basename = path.basename(originalMediaFilePath)
-    console.log('[handleTranscribeJob] starting', basename)
-
+    const config = configService.getWhisperConfig()
+    const modelPath = path.join(modelsDir, `ggml-${config.model}.bin`)
+    const basename = path.basename(modelPath)
     const encodedFilePath = await encodeForWhisper(originalMediaFilePath)
-
     const whisper = new Whisper(modelPath, { gpu: true })
     const pcm = read_wav(encodedFilePath)
     await job.setProgress(25, 100)
 
-    const config = configService.getWhisperConfig()
     const task = await whisper.transcribe(pcm, {
-      suppress_non_speech_tokens: true,
       ...config,
+      suppress_non_speech_tokens: true,
       print_progress: false,
+      suppress_blank: true,
       print_realtime: false,
       print_special: false,
       print_timestamps: false,
       debug_mode: false
+      // token_timestamps: true,
+      // format: 'detail',
+      // split_on_word: true,
+      // max_len: 1
     })
 
     const durationInMilliseconds = duration * 1000
@@ -51,6 +49,7 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
       if (job.state !== EmbeddedQueue.State.ACTIVE) return
 
       const id = `id-${subtitle.from}-${subtitle.to}`
+      console.log(subtitle)
 
       const window = BrowserWindow.getFocusedWindow()
       window?.webContents.send(IPCCHANNELS.SUBTITLE_ADDED, {

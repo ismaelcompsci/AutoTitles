@@ -13,6 +13,14 @@ export interface WhisperParams {
   tokenTimestamps: boolean
 }
 
+export type Caption = {
+  text: string
+  startMs: number
+  endMs: number
+  timestampMs: number | null
+  confidence: number | null
+}
+
 export type WhisperResponse = {
   from: number
   to: number
