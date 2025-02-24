@@ -8,6 +8,7 @@
   ],
   "compilerOptions": {
     "composite": true,
+    "skipLibCheck": true,
     "types": [
       "electron-vite/node"
     ]

@@ -72,19 +72,6 @@ export function getMediaType(mimeType: string): MediaType {
   }
 }
 
-export const scrollItemToCenter = (element: HTMLElement, container: HTMLElement) => {
-  if (!element) return
-  if (!container) return
-
-  // const activeElementTop = element.offsetTop
-  // const activeElementHeight = element.offsetHeight
-  // const containerHeight = element.clientHeight
-
-  // const scrollPosition = activeElementTop - containerHeight / 2 + activeElementHeight / 2
-
-  element.scrollIntoView({ block: 'center' })
-}
-
 export const getBasename = (file: string) => path.basename(file)
 
 export const getMediaDuration = (mediaUrl: string): Promise<number> => {

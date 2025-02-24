@@ -17,18 +17,12 @@ export class ConfigService {
     return ConfigService.instance
   }
 
-  private readonly baseWhisperInputConfig: WhisperInputConfig = {
+  private readonly baseWhisperInputConfig = {
     model: '',
-    useGpu: false,
-    maxLen: 0,
-    splitOnWord: false,
-    language: 'en',
-    nThreads: 4,
-    beamSize: 1,
-    temperatureInc: 0.2,
-    entropyThold: 2.4,
-    prompt: '',
-    maxContext: 0
+    language: 'auto',
+    maxLen: 60,
+    splitOnWord: 1,
+    translate: 0
   }
 
   private readonly baseExportConfig: ExportConfig = {
@@ -46,18 +40,12 @@ export class ConfigService {
       db.prepare(
         `
         INSERT INTO whisperconfig (
-          model, useGpu, maxLen, splitOnWord, language, nThreads,
-          beamSize, temperatureInc, entropyThold, prompt, maxContext
+          model, maxLen, splitOnWord, language, translate
         ) VALUES (
-          @model, @useGpu, @maxLen, @splitOnWord, @language, @nThreads,
-          @beamSize, @temperatureInc, @entropyThold, @prompt, @maxContext
+          @model, @maxLen, @splitOnWord, @language, @translate
         )
       `
-      ).run({
-        ...this.baseWhisperInputConfig,
-        useGpu: Number(this.baseWhisperInputConfig.useGpu),
-        splitOnWord: Number(this.baseWhisperInputConfig.splitOnWord)
-      })
+      ).run(this.baseWhisperInputConfig)
     }
 
     if (exportConfig.length === 0) {
@@ -68,13 +56,25 @@ export class ConfigService {
   }
 
   getWhisperConfig(): WhisperInputConfig {
-    return this.dbService
+    const dbConfig = this.dbService
       .getDatabase()
       .prepare('SELECT * FROM whisperconfig LIMIT 1')
       .get() as WhisperInputConfig
+
+    return {
+      model: dbConfig.model,
+      language: dbConfig.language,
+      maxLen: dbConfig.maxLen,
+      splitOnWord:
+        typeof dbConfig.splitOnWord === 'number'
+          ? dbConfig.splitOnWord === 1
+          : dbConfig.splitOnWord,
+      translate:
+        typeof dbConfig.translate === 'number' ? dbConfig.translate === 1 : dbConfig.translate
+    }
   }
 
-  updateWhisperConfig(key: keyof WhisperInputConfig, value: any): void {
+  updateWhisperConfig(key: keyof WhisperInputConfig, value: unknown): void {
     const stmt = this.dbService
       .getDatabase()
       .prepare(`UPDATE whisperconfig SET ${key} = ? WHERE id = 1`)

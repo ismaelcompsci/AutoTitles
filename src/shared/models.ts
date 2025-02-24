@@ -9,7 +9,6 @@ export interface WhisperParams {
   maxLen: number // max segment length in characters
   translate: boolean
   split_on_word: boolean
-  // max_tokens: number
   tokenTimestamps: boolean
 }
 
@@ -20,12 +19,6 @@ export type Caption = {
   timestampMs: number | null
   confidence: number | null
 }
-
-export type WhisperResponse = {
-  from: number
-  to: number
-  text: string
-}[]
 
 // Define the specific job data interfaces
 export interface TranscribeJobData {
@@ -83,25 +76,12 @@ export type WhisperInputConfig = {
   language: string
   maxLen: number
   splitOnWord: boolean
-  useGpu: boolean
-  maxContext: number
-  nThreads: number
-  beamSize: number
-  temperatureInc: number
-  entropyThold: number
-  prompt: string
+  translate: boolean
 }
 
 export type ExportConfig = {
   folder: string
   format: string
-}
-
-export type Subtitle = {
-  id: string
-  start: number
-  end: number
-  text: string
 }
 
 export type Model = { name: string; path: string }

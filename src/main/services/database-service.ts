@@ -27,31 +27,25 @@ export class DatabaseService {
 
   private initializeTables(): void {
     this.db.exec(`
-      CREATE TABLE IF NOT EXISTS subtitles (
-        segmentId INTEGER PRIMARY KEY AUTOINCREMENT,
+      CREATE TABLE IF NOT EXISTS captions (
+        captionId INTEGER PRIMARY KEY AUTOINCREMENT,
+        captionIndex INTEGER,
         fileName TEXT NOT NULL,
-        segmentIndex INTEGER,
-        segmentText TEXT,
-        startTime REAL,
-        endTime REAL,
-        duration REAL
+        text TEXT,
+        startMs REAL,
+        endMs REAL,
+        confidence REAL,
+        timestampMs REAL
       )
     `)
-
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS whisperconfig (
         id INTEGER PRIMARY KEY,
         model TEXT,
-        useGpu INTEGER,
         maxLen INTEGER,
         splitOnWord INTEGER,
         language TEXT,
-        nThreads INTEGER,
-        beamSize INTEGER,
-        temperatureInc REAL,
-        entropyThold REAL,
-        prompt TEXT,
-        maxContext INTEGER
+        translate INTEGER
       )
     `)
 

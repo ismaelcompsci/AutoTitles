@@ -34,7 +34,7 @@ export const IPCCHANNELS = {
 
   GET_EXPORT_OPTIONS: 'queue.getExportOptions',
   UPDATE_EXPORT_OPTION: 'queue.updateExportOption',
-  SUBTITLE_ADDED: 'subtitle:subtitle-added'
+  CAPTION_ADDED: 'caption:caption-added'
 } as const
 
 export const MODELS = [
@@ -68,3 +68,22 @@ export const modelSizes: Record<string, string> = {
 }
 
 export type WhisperModel = (typeof MODELS)[number]
+
+export const supportedLanguages: Record<string, string> = {
+  en: 'English',
+  de: 'German',
+  fr: 'French',
+  es: 'Spanish',
+  it: 'Italian',
+  nl: 'Dutch',
+  pt: 'Portuguese',
+  ru: 'Russian',
+  tr: 'Turkish',
+  uk: 'Ukrainian',
+  pl: 'Polish',
+  sv: 'Swedish',
+  cs: 'Czech',
+  zh: 'Chinese',
+  ja: 'Japanese',
+  ko: 'Korean'
+}

@@ -2,6 +2,15 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { IAPI } from '../renderer/renderer'
 import { IPCCHANNELS } from '../shared/constants'
+import {
+  Caption,
+  DownloadEvent,
+  ExportCompleted,
+  ExportListSerialized,
+  ModelCategory,
+  QueueProgress,
+  TranscribeListSerialized
+} from '../shared/models'
 
 const api: IAPI = {
   // main <-> renderer
@@ -26,7 +35,8 @@ const api: IAPI = {
 
   // main -> renderer
   onDownloadStarted: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_STARTED, subscription)
 
     return () => {
@@ -34,7 +44,8 @@ const api: IAPI = {
     }
   },
   onDownloadProgress: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_PROGRESS, subscription)
 
     return () => {
@@ -42,7 +53,8 @@ const api: IAPI = {
     }
   },
   onDownloadCompleted: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_COMPLETED, subscription)
 
     return () => {
@@ -50,7 +62,8 @@ const api: IAPI = {
     }
   },
   onDownloadCancelled: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_CANCELLED, subscription)
 
     return () => {
@@ -58,7 +71,8 @@ const api: IAPI = {
     }
   },
   onDownloadInterrupted: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_INTERRUPTED, subscription)
 
     return () => {
@@ -66,37 +80,40 @@ const api: IAPI = {
     }
   },
   onDownloadError: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: DownloadEvent) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.DOWNLOAD_MANAGER_ERROR, subscription)
 
     return () => {
       ipcRenderer.removeListener(IPCCHANNELS.DOWNLOAD_MANAGER_ERROR, subscription)
     }
   },
-  onSubtitleAdded: (callback) => {
-    const subscription = (_event, value) => callback(value)
-    ipcRenderer.on(IPCCHANNELS.SUBTITLE_ADDED, subscription)
+  onCaptionAdded: (callback) => {
+    const subscription = (_event: Electron.IpcRendererEvent, value: Caption) => callback(value)
+    ipcRenderer.on(IPCCHANNELS.CAPTION_ADDED, subscription)
 
     return () => {
-      ipcRenderer.removeListener(IPCCHANNELS.SUBTITLE_ADDED, subscription)
+      ipcRenderer.removeListener(IPCCHANNELS.CAPTION_ADDED, subscription)
     }
   },
   onQueueProgress: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: QueueProgress) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.QUEUE_PROGRESS, subscription)
     return () => {
       ipcRenderer.removeListener(IPCCHANNELS.QUEUE_PROGRESS, subscription)
     }
   },
   onExportCompleted: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: ExportCompleted) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.EXPORT_COMPLETED, subscription)
     return () => {
       ipcRenderer.removeListener(IPCCHANNELS.EXPORT_COMPLETED, subscription)
     }
   },
   onQueueSetRunning: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: boolean) => callback(value)
     ipcRenderer.on(IPCCHANNELS.QUEUE_SET_RUNNING, subscription)
 
     return () => {
@@ -104,7 +121,10 @@ const api: IAPI = {
     }
   },
   onQueueSetJobList: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (
+      _event: Electron.IpcRendererEvent,
+      value: (TranscribeListSerialized | ExportListSerialized)[]
+    ) => callback(value)
     ipcRenderer.on(IPCCHANNELS.QUEUE_SET_JOBLIST, subscription)
 
     return () => {
@@ -112,7 +132,8 @@ const api: IAPI = {
     }
   },
   onModelListUpdated: (callback) => {
-    const subscription = (_event, value) => callback(value)
+    const subscription = (_event: Electron.IpcRendererEvent, value: ModelCategory[]) =>
+      callback(value)
     ipcRenderer.on(IPCCHANNELS.MODEL_MANAGER_SET_MODEL_LIST, subscription)
 
     return () => {

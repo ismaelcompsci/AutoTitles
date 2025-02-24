@@ -1,13 +1,9 @@
-import { ExportConfig, WhisperInputConfig } from '../../shared/models'
+import { Caption, ExportConfig, WhisperInputConfig } from '../../shared/models'
 
-export interface DBSubtitle {
-  segmentId: number
+export interface DBCaption extends Caption {
+  captionId: number
+  captionIndex: number
   fileName: string
-  segmentIndex: number
-  segmentText: string
-  startTime: number
-  endTime: number
-  duration: number
 }
 
 export const baseWhisperInputConfig: WhisperInputConfig = {

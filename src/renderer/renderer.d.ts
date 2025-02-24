@@ -5,13 +5,13 @@ import {
   JobType,
   ModelCategory,
   SerializedJobForType,
-  Subtitle,
   WhisperInputConfig,
   ExportConfig,
   QueueProgress,
   ExportCompleted,
   TranscribeListSerialized,
-  ExportListSerialized
+  ExportListSerialized,
+  Caption
 } from '../shared/models'
 
 export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
@@ -30,11 +30,10 @@ interface QueueMangaerAPI {
   createJob: <T extends JobType>(args: { type: T; data: JobDataForType<T> }) => Promise<void>
   getJobList: <T extends JobType>(args: { type: T }) => Promise<SerializedJobForType<T>[]>
   getTranscribeOptions: () => Promise<WhisperInputConfig>
-  updateTranscribeOptions: (args: { key: string; value: string }) => Promise<void>
+  updateTranscribeOptions: (args: { key: string; value: unknown }) => Promise<void>
   queuePendingJobs: (type?: JobType) => Promise<void>
   clearQueue: () => Promise<void>
-
-  onSubtitleAdded: (callback: (value: Subtitle) => void) => () => void
+  onCaptionAdded: (callback: (value: Caption) => void) => () => void
   onQueueProgress: (callback: (value: QueueProgress) => void) => () => void
   onQueueSetRunning: (callback: (value: boolean) => void) => () => void
   onQueueSetJobList: (

@@ -57,7 +57,7 @@ export class QueueManager {
       }
     })
 
-    this.queue?.on(EmbeddedQueue.Event.Failure, (job: QueueJob, _error) => {
+    this.queue?.on(EmbeddedQueue.Event.Failure, (job: QueueJob) => {
       console.log('EmbeddedQueue.Event.Failure', job.type, job.id)
 
       const window = BrowserWindow.getFocusedWindow()

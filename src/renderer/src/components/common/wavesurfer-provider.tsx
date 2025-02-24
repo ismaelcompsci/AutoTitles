@@ -19,7 +19,7 @@ import {
 } from '../../state/state'
 import RegionsPlugin, { Region } from 'wavesurfer.js/dist/plugins/regions'
 import ZoomPlugin from 'wavesurfer.js/dist/plugins/zoom'
-import { Subtitle } from 'src/shared/models'
+import { Caption } from 'src/shared/models'
 import { store } from '@/state/store'
 
 type WavesurferContext = {
@@ -27,7 +27,7 @@ type WavesurferContext = {
   containerRef: RefObject<HTMLDivElement>
   videoRef: RefObject<HTMLVideoElement>
   regionsPlugin: RegionsPlugin
-  addRegion: (subtitle: Subtitle) => void
+  addRegion: (caption: Caption) => void
   reloadMedia: () => void
   clearRegions: () => void
   selectRegion: (id: string) => void
@@ -79,9 +79,9 @@ export const WavesurferProvider = ({ children }: Props) => {
     setCurrentTime(currentTime)
   }, [])
 
-  const handleLoading = useCallback((_progress: number) => {}, [])
+  const handleLoading = useCallback(() => {}, [])
 
-  const handleError = useCallback((_error: Error) => {
+  const handleError = useCallback(() => {
     setAudioURL(null)
   }, [])
 
@@ -178,12 +178,12 @@ export const WavesurferProvider = ({ children }: Props) => {
   }, [audioURL, videoRef])
 
   const addRegion = useCallback(
-    (segment: Subtitle) => {
+    (caption: Caption) => {
       regionsPlugin.addRegion({
-        id: String(segment.id),
-        start: segment.start / 1000,
-        end: segment.end / 1000,
-        content: segment.text,
+        id: `id-${caption.startMs}-${caption.endMs}`,
+        start: caption.startMs / 1000,
+        end: caption.endMs / 1000,
+        content: caption.text,
         color: regionColor.default,
         minLength: 0.2,
         drag: false,

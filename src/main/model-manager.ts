@@ -68,6 +68,21 @@ export const MODELS = {
   'large-v3-turbo': `${BASE_MODELS_URL}/ggml-large-v3-turbo.bin`
 } as const
 
+export const MODEL_TO_ALIGNMENT_PRESET: Record<keyof typeof MODELS, number> = {
+  'tiny.en': 3, // WHISPER_AHEADS_TINY_EN
+  tiny: 4, // WHISPER_AHEADS_TINY
+  'base.en': 5, // WHISPER_AHEADS_BASE_EN
+  base: 6, // WHISPER_AHEADS_BASE
+  'small.en': 7, // WHISPER_AHEADS_SMALL_EN
+  small: 8, // WHISPER_AHEADS_SMALL
+  'medium.en': 9, // WHISPER_AHEADS_MEDIUM_EN
+  medium: 10, // WHISPER_AHEADS_MEDIUM
+  'large-v1': 11, // WHISPER_AHEADS_LARGE_V1
+  'large-v2': 12, // WHISPER_AHEADS_LARGE_V2
+  'large-v3': 13, // WHISPER_AHEADS_LARGE_V3
+  'large-v3-turbo': 13 // Using LARGE_V3 preset for turbo variant
+} as const
+
 export const MODELLIST: ModelCategory[] = [
   {
     id: 'multilingual',

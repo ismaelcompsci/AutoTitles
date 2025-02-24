@@ -1,29 +1,28 @@
 import { useEffect, useRef } from 'react'
 import { useAtomValue } from 'jotai'
-import { clampPosition, cn, millisecondsToTimestamp, scrollItemToCenter } from '@/lib/utils'
+import { cn, millisecondsToTimestamp } from '@/lib/utils'
 import { useWavesurfer } from '../common/wavesurfer-provider'
-import { subtitlesAtom } from '@/state/state'
-import { durationAtom } from '@/state/state'
+import { captionsAtom } from '@/state/state'
 import { activeRegionIdAtom } from '@/state/state'
 
-export const SubtitleList = () => {
-  const subtitles = useAtomValue(subtitlesAtom)
+export const CaptionList = () => {
+  const captions = useAtomValue(captionsAtom)
   const activeRegionId = useAtomValue(activeRegionIdAtom)
-  const duration = useAtomValue(durationAtom)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const { ws } = useWavesurfer()
+
+  const captionRefs = useRef({})
 
   useEffect(() => {
     if (!activeRegionId) return
 
-    const activeElement = document.getElementById(activeRegionId) as HTMLElement | null | undefined
+    const element = captionRefs.current[activeRegionId]
+    if (!element) return
 
-    const container = scrollAreaRef.current
-
-    if (!activeElement) return
-    if (!container) return
-
-    scrollItemToCenter(activeElement, container)
+    element.scrollIntoView({
+      behavior: 'instant',
+      block: 'nearest'
+    })
   }, [activeRegionId])
 
   const handleRowClicked = (start: number) => {
@@ -33,30 +32,32 @@ export const SubtitleList = () => {
   return (
     <div ref={scrollAreaRef} className="relative flex h-full overflow-hidden @container">
       <div className="flex flex-1 justify-center overflow-y-auto pb-10 pl-2 pr-1 pt-4 outline-none [scroll-padding-block:48px] [scrollbar-gutter:stable] [&::-webkit-scrollbar-thumb]:bg-gray-100/15 [&::-webkit-scrollbar]:w-[8px]">
-        {subtitles.length > 0 ? (
+        {captions.length > 0 ? (
           <div className="flex h-full w-full min-w-[380px] max-w-[800px] select-none flex-col gap-px outline-none after:pb-10">
-            {subtitles?.map((subtitle, i) => {
-              const start = clampPosition(duration, subtitle.start / 1000)
-              const end = clampPosition(duration, subtitle.end / 1000)
-
+            {captions?.map((caption, i) => {
+              const start = caption.startMs
+              const end = caption.endMs
               const id = `id-${start}-${end}`
               const active = id === activeRegionId
 
               return (
                 <div
+                  ref={(el) => {
+                    if (el) captionRefs.current[id] = el
+                  }}
                   onClick={() => handleRowClicked(start)}
                   key={id}
                   id={id}
                   className={cn(
                     'p-4 rounded-lg transition-colors hover:bg-gray-200 relative',
                     active && 'bg-gray-100',
-                    i !== subtitles.length ? 'mb-1' : undefined
+                    i !== captions.length ? 'mb-1' : undefined
                   )}
                 >
                   <div className="text-sm text-muted-foreground">
-                    {millisecondsToTimestamp(subtitle.start)}
+                    {millisecondsToTimestamp(caption.startMs)}
                   </div>
-                  <div className="text-sm">{subtitle.text}</div>
+                  <div className="text-sm">{caption.text}</div>
 
                   <div
                     className={cn(

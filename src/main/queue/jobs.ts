@@ -2,16 +2,16 @@ import EmbeddedQueue from 'embedded-queue'
 import fs from 'fs'
 import { Whisper } from 'smart-whisper'
 import path from 'path'
-import { ExportJob, Subtitle, TranscribeJob } from '../../shared/models'
+import { Caption, ExportJob, TranscribeJob } from '../../shared/models'
 import { BrowserWindow } from 'electron'
 import { encodeForWhisper } from '../handle/encode-for-whisper'
 import { decode } from 'node-wav'
-import { SubtitleService } from '../services/subtitle-service'
+import { CaptionService } from '../services/caption-service'
 import { ConfigService } from '../services/config-service'
-import { IPCCHANNELS } from '../../shared/constants'
-import { modelsDir } from '../model-manager'
+import { IPCCHANNELS, supportedLanguages } from '../../shared/constants'
+import { MODEL_TO_ALIGNMENT_PRESET, modelsDir } from '../model-manager'
 
-const subtitleService = SubtitleService.getInstance()
+const captionService = CaptionService.getInstance()
 const configService = ConfigService.getInstance()
 
 export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => {
@@ -23,58 +23,79 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
     const modelPath = path.join(modelsDir, `ggml-${config.model}.bin`)
     const basename = path.basename(modelPath)
     const encodedFilePath = await encodeForWhisper(originalMediaFilePath)
-    const whisper = new Whisper(modelPath, { gpu: true })
+    const whisper = new Whisper(modelPath, {
+      use_gpu: true,
+      dtw_token_timestamps: true,
+      dtw_aheads_preset: MODEL_TO_ALIGNMENT_PRESET[config.model]
+    })
     const pcm = read_wav(encodedFilePath)
     await job.setProgress(25, 100)
 
+    if (config.language !== 'auto' && !supportedLanguages[config.language]) {
+      throw new Error(`Language ${config.language} is not supported`)
+    }
+
+    if (!isModelMultilingual(config.model)) {
+      if (config.translate || config.language !== 'en') {
+        config.language = 'en'
+        config.translate = false
+        console.log('WARNING: model is not multilingual, ignoring language and translation options')
+      }
+    }
+
     const task = await whisper.transcribe(pcm, {
-      ...config,
-      suppress_non_speech_tokens: true,
       print_progress: false,
-      suppress_blank: true,
       print_realtime: false,
       print_special: false,
       print_timestamps: false,
-      debug_mode: false
-      // token_timestamps: true,
-      // format: 'detail',
-      // split_on_word: true,
-      // max_len: 1
+      debug_mode: false,
+      suppress_blank: true,
+      suppress_non_speech_tokens: true,
+      token_timestamps: true,
+      format: 'detail',
+      split_on_word: true,
+      max_len: config.maxLen === 0 ? 60 : config.maxLen,
+      language: config.language
     })
 
     const durationInMilliseconds = duration * 1000
-    let index = 0
-
-    task.on('transcribed', (subtitle) => {
+    // WHEN TOKEN_TIMESTAMPS IS TRUE
+    // THIS GETS BAD SUBTITLES
+    // BUT THE task.result is fine
+    task.on('transcribed', (caption) => {
       if (job.state !== EmbeddedQueue.State.ACTIVE) return
 
-      const id = `id-${subtitle.from}-${subtitle.to}`
-      console.log(subtitle)
-
-      const window = BrowserWindow.getFocusedWindow()
-      window?.webContents.send(IPCCHANNELS.SUBTITLE_ADDED, {
-        id,
-        start: subtitle.from,
-        end: subtitle.to,
-        text: subtitle.text
-      })
-
-      subtitleService.insertSubtitle({
-        fileName: basename,
-        segmentIndex: index,
-        segmentText: subtitle.text,
-        startTime: subtitle.from,
-        endTime: subtitle.to,
-        duration: subtitle.to - subtitle.from
-      })
-
-      index += 1
-
-      const transcriptionProgress = 50 + Math.min((subtitle.to / durationInMilliseconds) * 49, 49)
+      const transcriptionProgress = 50 + Math.min((caption.to / durationInMilliseconds) * 49, 49)
       job.setProgress(Math.round(transcriptionProgress), 100)
     })
 
-    await task.result
+    const result = await task.result
+    const window = BrowserWindow.getFocusedWindow()
+
+    for (const [index, caption] of result.entries()) {
+      console.log(index, caption)
+
+      if (caption.text === '') {
+        continue
+      }
+
+      const addedCaption: Caption = {
+        text: index === 0 ? caption.text.trimStart() : caption.text,
+        startMs: caption.from,
+        endMs: caption.to,
+        timestampMs: caption.tokens[0].t_dtw === -1 ? null : caption.tokens[0].t_dtw * 10,
+        confidence: caption.tokens[0].p
+      }
+
+      window?.webContents.send(IPCCHANNELS.CAPTION_ADDED, addedCaption)
+
+      captionService.insertCaption({
+        ...addedCaption,
+        fileName: basename,
+        captionIndex: index
+      })
+    }
+
     await whisper.free()
 
     fs.rmSync(encodedFilePath)
@@ -90,19 +111,12 @@ export const handleExportJob = async (job: ExportJob): Promise<string> => {
   console.log('[handleExportJob] starting ', basename)
 
   const config = configService.getExportConfig()
-  const subs = subtitleService.getSubtitlesByFileName(basename)
+  const subs = captionService.getCaptionsByFileName(basename)
 
   let content = ''
   switch (config.format) {
     case 'srt':
-      content = generateSRT(
-        subs.map((s) => ({
-          id: `id-${s.startTime}-${s.endTime}`,
-          start: s.startTime,
-          end: s.endTime,
-          text: s.segmentText
-        }))
-      )
+      content = generateSRT(subs)
       break
   }
 
@@ -110,7 +124,7 @@ export const handleExportJob = async (job: ExportJob): Promise<string> => {
   const outputPath = path.join(config.folder, basenameNoExt + '.srt')
   fs.writeFileSync(outputPath, content, 'utf-8')
 
-  subtitleService.removeAll()
+  captionService.removeAll()
   return outputPath
 }
 
@@ -131,11 +145,11 @@ export function read_wav(file: string): Float32Array {
 }
 
 // Generate SRT content
-export function generateSRT(data: Subtitle[]): string {
+export function generateSRT(data: Caption[]): string {
   return data
     .map((item, index) => {
-      const startTime = formatTime(item.start)
-      const endTime = formatTime(item.end)
+      const startTime = formatTime(item.startMs)
+      const endTime = formatTime(item.endMs)
       return `${index + 1}\n${startTime} --> ${endTime}\n${item.text}\n`
     })
     .join('\n')
@@ -153,4 +167,11 @@ function formatTime(ms: number) {
     .toString()
     .padStart(2, '0')
   return `${hours}:${minutes}:${seconds},${milliseconds}`
+}
+
+const isModelMultilingual = (model: string) => {
+  if (!model.endsWith('.en') && model.startsWith('large')) {
+    return true
+  }
+  return false
 }

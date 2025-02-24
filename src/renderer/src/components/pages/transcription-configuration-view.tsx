@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { Button } from '../ui/button'
-import { Component, FileVolume, MoveRight, Plus } from 'lucide-react'
+import { Component, FileVolume, MoveRight } from 'lucide-react'
 import NumberInput from '../common/number-input'
 import { ConfigSection } from '../common/config-section'
 import { ConfigItem } from '../common/config-item'
@@ -8,8 +8,8 @@ import {
   audioURLAtom,
   durationAtom,
   pageAtom,
-  subtitlesAtom,
-  subtitlesByIdAtom,
+  captionsAtom,
+  captionsByIdAtom,
   transcribeJobListAtom,
   transcribeOptionsAtom
 } from '@/state/state'
@@ -29,8 +29,8 @@ import { ScrollArea } from '../ui/scroll-area'
 export const TranscriptionConfigurationView = () => {
   const setPage = useSetAtom(pageAtom)
   const setAudioURL = useSetAtom(audioURLAtom)
-  const setSubtitles = useSetAtom(subtitlesAtom)
-  const setSubtitlesById = useSetAtom(subtitlesByIdAtom)
+  const setCaptions = useSetAtom(captionsAtom)
+  const setCaptionsById = useSetAtom(captionsByIdAtom)
   const setDuration = useSetAtom(durationAtom)
   const [transcribeOptions, setTranscribeOptions] = useAtom(transcribeOptionsAtom)
   const transcribeJobList = useAtomValue(transcribeJobListAtom)
@@ -43,8 +43,8 @@ export const TranscriptionConfigurationView = () => {
       const job = transcribeJobList[0]
 
       setAudioURL(job.originalMediaFilePath)
-      setSubtitles([])
-      setSubtitlesById({})
+      setCaptions([])
+      setCaptionsById({})
       clearRegions()
       setDuration(0)
       setPage('transcript')
@@ -145,8 +145,12 @@ export const TranscriptConfigurationForm = ({
   const [modelList, setModelList] = useState<ModelCategory[]>([])
   const [selectedModel, setSelectedModel] = useState<ModelItem | undefined>()
 
-  const handleValueChange = async (key: string, value: any) => {
-    await window.api.updateTranscribeOptions({ key, value })
+  const handleValueChange = async (key: keyof WhisperInputConfig, value: unknown) => {
+    try {
+      await window.api.updateTranscribeOptions({ key, value })
+    } catch (error) {
+      console.error('Error updating transcription options:', error)
+    }
   }
 
   const syncModelList = async (modelCategorys: ModelCategory[]) => {

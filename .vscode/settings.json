@@ -79,5 +79,6 @@
     "variant": "cpp",
     "vector": "cpp",
     "algorithm": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "/Users/mirnaolvera/MALLEL/web/AutoTitles/packages/smart-whisper/whisper.cpp"
 }

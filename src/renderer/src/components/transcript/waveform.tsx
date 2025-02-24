@@ -1,12 +1,12 @@
 import { useAtom, useAtomValue } from 'jotai'
-import { activeRegionIdAtom, audioURLAtom, subtitlesAtom, subtitlesByIdAtom } from '@/state/state'
+import { activeRegionIdAtom, audioURLAtom, captionsAtom, captionsByIdAtom } from '@/state/state'
 import { useEffect } from 'react'
 
 import { useWavesurfer } from '../common/wavesurfer-provider'
 
 export const Waveform = () => {
-  const [subtitles, setSubtitles] = useAtom(subtitlesAtom)
-  const [subtitlesById, setSubtitlesById] = useAtom(subtitlesByIdAtom)
+  const [captions, setCaptions] = useAtom(captionsAtom)
+  const [captionsById, setCaptionsById] = useAtom(captionsByIdAtom)
   const audioURL = useAtomValue(audioURLAtom)
   const { ws, containerRef, addRegion, reloadMedia, selectRegion } = useWavesurfer()
   const activeRegionId = useAtomValue(activeRegionIdAtom)
@@ -29,14 +29,15 @@ export const Waveform = () => {
     if (!ws) return
 
     const subs = [
-      window.api.onSubtitleAdded((sub) => {
-        if (!subtitlesById[sub.id]) {
-          subtitlesById[sub.id] = sub
-          subtitles.push(sub)
+      window.api.onCaptionAdded((caption) => {
+        const id = `id-${caption.startMs}-${caption.endMs}`
+        if (!captions[id]) {
+          captionsById[id] = caption
+          captions.push(caption)
 
-          setSubtitles([...subtitles])
-          setSubtitlesById({ ...subtitlesById })
-          addRegion(sub)
+          setCaptions([...captions])
+          setCaptionsById({ ...captionsById })
+          addRegion(caption)
         }
       })
     ]

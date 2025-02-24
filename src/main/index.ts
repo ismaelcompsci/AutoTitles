@@ -2,14 +2,13 @@ import { app, shell, BrowserWindow, ipcMain, nativeImage } from 'electron'
 import path from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-// @ts-ignore
 import icon from '../../resources/icon.png?asset'
-import { DEFAULT_DOWNLOADS_DIR, getModelDownloadsFolder } from './handle/filesystem'
+import { DEFAULT_DOWNLOADS_DIR } from './handle/filesystem'
 import { IPCCHANNELS } from '../shared/constants'
 import { QueueManager } from './queue/queue-manager'
 import { ConfigService } from './services/config-service'
 import { cancel, download } from './download-manager'
-import { deleteModel, getModelList } from './model-manager'
+import { deleteModel, getModelList, modelsDir } from './model-manager'
 import { showMessageBox, showOpenDialog } from './handle/dialog'
 import { JobDataForType, JobType } from '../shared/models'
 
@@ -72,7 +71,7 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER, getModelDownloadsFolder)
+  ipcMain.handle(IPCCHANNELS.FILESYSTEM_GET_MODEL_DOWNLOADS_FOLDER, () => modelsDir)
   ipcMain.handle(IPCCHANNELS.FILESYSTEM_CHOOSE_FOLDER, showOpenDialog)
   ipcMain.handle(IPCCHANNELS.DIALOG_SHOW_MESSAGE_BOX, showMessageBox)
   ipcMain.handle(IPCCHANNELS.SHOW_FILE_IN_FILESYSTEM, (_event, file: string) =>
@@ -126,7 +125,7 @@ setupDownloadManger()
 setupModelManager()
 
 async function setupModelManager() {
-  ipcMain.handle(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST, (_event) => {
+  ipcMain.handle(IPCCHANNELS.MODEL_MANAGER_GET_MODEL_LIST, () => {
     return getModelList()
   })
 
@@ -155,20 +154,29 @@ async function setupQueueHandlers() {
 
   ipcMain.handle(
     IPCCHANNELS.CREATE_JOB,
-    <T extends JobType>(_event, args: { type: T; data: JobDataForType<T> }) => {
+    <T extends JobType>(
+      _event: Electron.IpcMainInvokeEvent,
+      args: { type: T; data: JobDataForType<T> }
+    ) => {
       const { type, data } = args
       return queue.createJob(type, data)
     }
   )
 
-  ipcMain.handle(IPCCHANNELS.QUEUE_PENDING_JOBS, (_event, type?: JobType) => {
-    return queue.queuePendingJobs(type)
-  })
+  ipcMain.handle(
+    IPCCHANNELS.QUEUE_PENDING_JOBS,
+    (_event: Electron.IpcMainInvokeEvent, type?: JobType) => {
+      return queue.queuePendingJobs(type)
+    }
+  )
 
-  ipcMain.handle(IPCCHANNELS.GET_JOBLIST, <T extends JobType>(_event, args: { type: T }) => {
-    const { type } = args
-    return queue.getJobList(type)
-  })
+  ipcMain.handle(
+    IPCCHANNELS.GET_JOBLIST,
+    <T extends JobType>(_event: Electron.IpcMainInvokeEvent, args: { type: T }) => {
+      const { type } = args
+      return queue.getJobList(type)
+    }
+  )
 
   ipcMain.handle(IPCCHANNELS.QUEUE_CLEAR, () => {
     return queue.clear()

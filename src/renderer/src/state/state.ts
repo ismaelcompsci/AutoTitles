@@ -1,8 +1,8 @@
 import { atom } from 'jotai'
 import {
+  Caption,
   ExportListSerialized,
   QueueProgress,
-  Subtitle,
   TranscribeListSerialized,
   WhisperInputConfig
 } from 'src/shared/models'
@@ -18,8 +18,8 @@ export const jobProgressAtom = atom<QueueProgress | null>()
 export const jobIsRunningAtom = atom<boolean>(false)
 export const transcribeJobListAtom = atom<TranscribeListSerialized[]>([])
 export const exportJobListAtom = atom<ExportListSerialized[]>([])
-export const subtitlesAtom = atom<Subtitle[]>([])
-export const subtitlesByIdAtom = atom<Record<string, Subtitle>>({})
+export const captionsAtom = atom<Caption[]>([])
+export const captionsByIdAtom = atom<Record<string, Caption>>({})
 export const regionsAtom = atom<Regions | null>(null)
 export const decodedAtom = atom(false)
 export const durationAtom = atom(0)

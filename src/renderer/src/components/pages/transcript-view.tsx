@@ -1,6 +1,6 @@
 import { MediaPlayerControls } from '../transcript/controls'
 import { VideoPlayer } from '../transcript/video-player'
-import { SubtitleList } from '../transcript/subtitle-list'
+import { CaptionList } from '../transcript/caption-list'
 import { Waveform } from '../transcript/waveform'
 import { ResizablePanel } from '../common/resizeable-panel'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -39,7 +39,7 @@ export const TopPanel = () => {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <VideoPlayer />
 
-        <SubtitleList />
+        <CaptionList />
       </div>
     </div>
   )

@@ -5,8 +5,8 @@ import {
   audioURLAtom,
   exportJobListAtom,
   pageAtom,
-  subtitlesAtom,
-  subtitlesByIdAtom
+  captionsAtom,
+  captionsByIdAtom
 } from '@/state/state'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,8 +35,8 @@ export const ExportView = () => {
   const [exportJobList, setExportJobList] = useAtom(exportJobListAtom)
   const [exportOptions, setExportOptions] = useState<ExportConfig>()
   const [audioURL, setAudioUrl] = useAtom(audioURLAtom)
-  const setSubtitles = useSetAtom(subtitlesAtom)
-  const setSubtitlesById = useSetAtom(subtitlesByIdAtom)
+  const setCaptions = useSetAtom(captionsAtom)
+  const setCaptionsById = useSetAtom(captionsByIdAtom)
   const setPage = useSetAtom(pageAtom)
 
   const handleStartOver = () => {
@@ -50,8 +50,8 @@ export const ExportView = () => {
 
     setExportJobList([])
     setAudioUrl(null)
-    setSubtitles([])
-    setSubtitlesById({})
+    setCaptions([])
+    setCaptionsById({})
   }
 
   const getExportJobList = async () => {
