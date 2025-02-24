@@ -1,0 +1,3 @@
+[submodule "packages/smart-whisper"]
+	path = packages/smart-whisper
+	url = https://github.com/ismaelcompsci/smart-whisper.git
