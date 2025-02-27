@@ -9,7 +9,13 @@ import {
 import type Regions from 'wavesurfer.js/dist/plugins/regions'
 import { withUndo } from 'jotai-history'
 
-export type Page = 'home' | 'transcript-config' | 'transcript' | 'export' | 'model-manager'
+export type Page =
+  | 'home'
+  | 'transcript-config'
+  | 'transcript'
+  | 'export'
+  | 'model-manager'
+  | 'video'
 export const pageAtom = atom<Page>('home')
 export const pageHistory = withUndo<Page>(pageAtom, 10)
 export const mainContainerRefAtom = atom<HTMLDivElement | null>(null)

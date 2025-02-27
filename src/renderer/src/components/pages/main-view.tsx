@@ -7,6 +7,7 @@ import { mainContainerRefAtom } from '@/state/state'
 import { ExportView } from './export-view'
 import { ModelManagerView } from './model-manager-view'
 import { cn } from '@/lib/utils'
+import { VideoPage } from './video-page'
 
 export const MainView = () => {
   const setMainContainerRef = useSetAtom(mainContainerRefAtom)
@@ -28,6 +29,9 @@ export const MainView = () => {
       break
     case 'model-manager':
       View = ModelManagerView
+      break
+    case 'video':
+      View = VideoPage
       break
   }
 
