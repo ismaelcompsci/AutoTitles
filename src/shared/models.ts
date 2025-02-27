@@ -123,3 +123,11 @@ export type QueueProgress = {
 export type ExportCompleted = {
   outputPath: string
 }
+
+export type VideoMetadata = {
+  width: number
+  height: number
+  duration: number
+  fps: number
+  aspectRatio: number
+}

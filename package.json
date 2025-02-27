@@ -20,7 +20,7 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run bundle-remotion && electron-vite build && electron-builder --mac",
     "build:linux": "npm run bundle-remotion && electron-vite build && electron-builder --linux",
-    "bundle-remotion": "node src/main/services/remotion/bundleRemotion.js"
+    "bundle-remotion": "node src/main/services/remotion/bundleRemotion.mjs"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
@@ -46,7 +46,6 @@
     "@remotion/player": "^4.0.269",
     "@remotion/tailwind": "^4.0.269",
     "@types/node-wav": "^0.0.3",
-    "@wavesurfer/react": "^1.0.8",
     "better-sqlite3": "^11.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -69,8 +68,7 @@
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^11.0.5",
-    "wavesurfer.js": "^7.8.16"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

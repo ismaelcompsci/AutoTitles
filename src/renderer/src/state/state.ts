@@ -6,16 +6,10 @@ import {
   TranscribeListSerialized,
   WhisperInputConfig
 } from 'src/shared/models'
-import type Regions from 'wavesurfer.js/dist/plugins/regions'
+
 import { withUndo } from 'jotai-history'
 
-export type Page =
-  | 'home'
-  | 'transcript-config'
-  | 'transcript'
-  | 'export'
-  | 'model-manager'
-  | 'video'
+export type Page = 'home' | 'transcript-config' | 'export' | 'model-manager' | 'video'
 export const pageAtom = atom<Page>('home')
 export const pageHistory = withUndo<Page>(pageAtom, 10)
 export const mainContainerRefAtom = atom<HTMLDivElement | null>(null)
@@ -26,7 +20,6 @@ export const transcribeJobListAtom = atom<TranscribeListSerialized[]>([])
 export const exportJobListAtom = atom<ExportListSerialized[]>([])
 export const captionsAtom = atom<Caption[]>([])
 export const captionsByIdAtom = atom<Record<string, Caption>>({})
-export const regionsAtom = atom<Regions | null>(null)
 export const decodedAtom = atom(false)
 export const durationAtom = atom(0)
 

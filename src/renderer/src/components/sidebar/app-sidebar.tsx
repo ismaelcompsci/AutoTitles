@@ -1,4 +1,4 @@
-import { AudioWaveform, Home, Package } from 'lucide-react'
+import { Camera, Home, Package } from 'lucide-react'
 
 import {
   Sidebar,
@@ -22,9 +22,9 @@ const items = [
     icon: Home
   },
   {
-    title: 'Transcription',
-    page: 'transcript',
-    icon: AudioWaveform
+    title: 'Captions',
+    page: 'captions',
+    icon: Camera
   },
   {
     title: 'Export Manager',

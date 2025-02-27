@@ -1,7 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { HomeView } from './home-view'
 import { TranscriptionConfigurationView } from './transcription-configuration-view'
-import { TranscriptView } from './transcript-view'
 import { pageAtom } from '@/state/state'
 import { mainContainerRefAtom } from '@/state/state'
 import { ExportView } from './export-view'
@@ -20,9 +19,6 @@ export const MainView = () => {
       break
     case 'transcript-config':
       View = TranscriptionConfigurationView
-      break
-    case 'transcript':
-      View = TranscriptView
       break
     case 'export':
       View = ExportView

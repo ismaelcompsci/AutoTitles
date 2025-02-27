@@ -32,6 +32,7 @@ const api: IAPI = {
   updateExportOptions: (args) => ipcRenderer.invoke(IPCCHANNELS.UPDATE_EXPORT_OPTION, args),
   showItemInFilesystem: (file) => ipcRenderer.invoke(IPCCHANNELS.SHOW_FILE_IN_FILESYSTEM, file),
   abortRunningJob: () => ipcRenderer.invoke(IPCCHANNELS.QUEUE_ABORT_RUNNING_JOB),
+  parseMedia: (file) => ipcRenderer.invoke(IPCCHANNELS.PARSE_MEDIA, file),
 
   // main -> renderer
   onDownloadStarted: (callback) => {

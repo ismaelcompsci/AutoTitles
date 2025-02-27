@@ -1,12 +1,11 @@
-import { AppHeader } from './components/common/app-header'
-import { MainView } from './components/pages/main-view'
-import { ThemeProvider } from './components/common/providers'
-import { WavesurferProvider } from './components/common/wavesurfer-provider'
-import { SidebarProvider } from './components/ui/sidebar'
-import { Toaster } from './components/ui/toaster'
-import { AppSidebar } from './components/sidebar/app-sidebar'
+import { AppHeader } from '@/components/common/app-header'
+import { MainView } from '@/pages/main-view'
+import { ThemeProvider } from '@/components/common/providers'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { Toaster } from '@/components/ui/toaster'
+import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { Provider } from 'jotai'
-import { store } from './state/store'
+import { store } from '@/state/store'
 
 export function App(): JSX.Element {
   return (
@@ -14,21 +13,19 @@ export function App(): JSX.Element {
       <SidebarProvider>
         <ThemeProvider storageKey="vite-ui-theme">
           <div className="relative flex h-screen w-screen flex-col overflow-hidden">
-            <WavesurferProvider>
-              <AppHeader />
+            <AppHeader />
 
-              {/* main */}
-              <main className="isolate flex size-full overflow-hidden bg-background-200">
-                <div className="relative flex h-full pr-2 bg-background-200">
-                  <AppSidebar />
-                </div>
+            {/* main */}
+            <main className="isolate flex size-full overflow-hidden bg-background-200">
+              <div className="relative flex h-full pr-2 bg-background-200">
+                <AppSidebar />
+              </div>
 
-                <MainView />
-              </main>
+              <MainView />
+            </main>
 
-              {/* <TailwindIndicator /> */}
-              <Toaster richColors position="bottom-right" />
-            </WavesurferProvider>
+            {/* <TailwindIndicator /> */}
+            <Toaster richColors position="bottom-right" />
           </div>
         </ThemeProvider>
       </SidebarProvider>

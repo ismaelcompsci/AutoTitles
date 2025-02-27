@@ -49,7 +49,7 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
       print_special: false,
       print_timestamps: false,
       debug_mode: false,
-      suppress_blank: true,
+      suppress_blank: false,
       suppress_non_speech_tokens: true,
       token_timestamps: true,
       format: 'detail',
@@ -96,10 +96,9 @@ export const handleTranscribeJob = async (job: TranscribeJob): Promise<void> => 
       })
     }
 
-    await whisper.free()
-
     fs.rmSync(encodedFilePath)
     await job.setProgress(100, 100)
+    await whisper.free()
   } catch (e) {
     console.log('[handleTranscribeJob] Error: ', e)
   }

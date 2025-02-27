@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useAtomValue } from 'jotai'
 import { cn, millisecondsToTimestamp } from '@/lib/utils'
-import { useWavesurfer } from '../common/wavesurfer-provider'
+
 import { captionsAtom } from '@/state/state'
 import { activeRegionIdAtom } from '@/state/state'
 
@@ -9,7 +9,6 @@ export const CaptionList = () => {
   const captions = useAtomValue(captionsAtom)
   const activeRegionId = useAtomValue(activeRegionIdAtom)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-  const { ws } = useWavesurfer()
 
   const captionRefs = useRef({})
 
@@ -25,9 +24,7 @@ export const CaptionList = () => {
     })
   }, [activeRegionId])
 
-  const handleRowClicked = (start: number) => {
-    ws?.setTime(start + 0.01)
-  }
+  // const handleRowClicked = (start: number) => {}
 
   return (
     <div ref={scrollAreaRef} className="relative flex h-full overflow-hidden @container">
@@ -45,7 +42,7 @@ export const CaptionList = () => {
                   ref={(el) => {
                     if (el) captionRefs.current[id] = el
                   }}
-                  onClick={() => handleRowClicked(start)}
+                  // onClick={() => handleRowClicked(start)}
                   key={id}
                   id={id}
                   className={cn(

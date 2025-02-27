@@ -34,7 +34,8 @@ export const IPCCHANNELS = {
 
   GET_EXPORT_OPTIONS: 'queue.getExportOptions',
   UPDATE_EXPORT_OPTION: 'queue.updateExportOption',
-  CAPTION_ADDED: 'caption:caption-added'
+  CAPTION_ADDED: 'caption:caption-added',
+  PARSE_MEDIA: 'parseMedia'
 } as const
 
 export const MODELS = [

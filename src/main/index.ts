@@ -11,6 +11,7 @@ import { cancel, download } from './download-manager'
 import { deleteModel, getModelList, modelsDir } from './model-manager'
 import { showMessageBox, showOpenDialog } from './handle/dialog'
 import { JobDataForType, JobType } from '../shared/models'
+import { parseMedia } from './handle/parseMedia'
 
 const appIcon = nativeImage.createFromPath(icon)
 const configService = ConfigService.getInstance()
@@ -93,6 +94,10 @@ app.whenReady().then(async () => {
 
   ipcMain.handle(IPCCHANNELS.UPDATE_EXPORT_OPTION, (_event, { key, value }) => {
     return configService.updateExportConfig(key, value)
+  })
+
+  ipcMain.handle(IPCCHANNELS.PARSE_MEDIA, (_event, file: string) => {
+    return parseMedia(file)
   })
 
   createWindow()

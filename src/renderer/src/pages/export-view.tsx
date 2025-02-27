@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Page } from '../ui/page'
+import { Page } from '@/components/ui/page'
 import { useAtom, useSetAtom } from 'jotai'
 import {
   audioURLAtom,
@@ -17,9 +17,9 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue
-} from '../ui/select'
-import { ConfigSection } from '../common/config-section'
-import { ConfigItem } from '../common/config-item'
+} from '@/components/ui/select'
+import { ConfigSection } from '@/components/common/config-section'
+import { ConfigItem } from '@/components/common/config-item'
 import { ExportConfig } from 'src/shared/models'
 import { getBasename } from '@/lib/utils'
 import { toast } from 'sonner'

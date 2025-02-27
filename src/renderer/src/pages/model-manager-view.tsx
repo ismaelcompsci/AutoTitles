@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Page } from '../ui/page'
+import { Page } from '@/components/ui/page'
 import { motion } from 'motion/react'
 import { Check, Component, Download, Trash, X } from 'lucide-react'
 import { DownloadEvent, ModelCategory, ModelItem } from 'src/shared/models'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
-import { cn } from '@/lib/utils'
-import { Gauge } from '../ui/gauge'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn, filterModelListByTab } from '@/lib/utils'
+import { Gauge } from '@/components/ui/gauge'
 import { toast } from 'sonner'
 
 const tabs = [
@@ -15,42 +15,9 @@ const tabs = [
   { id: 'english', name: 'English Only' }
 ]
 
-const filterModelListByTab = (modelList: ModelCategory[], tab: string) => {
-  return modelList.reduce((acc: ModelCategory[], modelGroup) => {
-    let filteredItems = [...modelGroup.items]
-
-    switch (tab) {
-      case 'downloaded':
-        filteredItems = modelGroup.items.filter((item) => !item.disabled)
-        if (filteredItems.length > 0) {
-          acc.push({
-            ...modelGroup,
-            items: filteredItems
-          })
-        }
-        break
-      case 'multilingual':
-        if (modelGroup.id === 'multilingual') {
-          acc.push(modelGroup)
-        }
-        break
-      case 'english':
-        if (modelGroup.id === 'english') {
-          acc.push(modelGroup)
-        }
-        break
-      case 'all':
-      default:
-        acc.push(modelGroup)
-        break
-    }
-    return acc
-  }, [])
-}
-
 type DownloadState = { status: string; progress?: number; error?: string; id: string }
 export const ModelManagerView = () => {
-  const [activeTab, setActiveTab] = useState(tabs[1].id)
+  const [activeTab, setActiveTab] = useState(tabs[0].id)
   const [modelList, setModelList] = useState<ModelCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadState>>({})

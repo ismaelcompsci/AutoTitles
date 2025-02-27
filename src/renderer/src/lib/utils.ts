@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
-import path from 'path'
+import { ModelCategory } from 'src/shared/models'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]): string {
@@ -30,19 +30,7 @@ export function millisecondsToTimestamp(ms: number) {
 export const clampPosition = (duration: number, time: number): number => {
   return Math.max(0, Math.min(duration, time))
 }
-
-export const supportedFormats = [
-  'wav',
-  'mp3',
-  'm4a',
-  'aac',
-  'flac',
-  'ogg',
-  'opus',
-  'mp4',
-  'mov',
-  'mkv'
-]
+export const supportedFormats = ['mp4', 'mov']
 
 export type MediaType = 'video' | 'audio' | 'unsupported'
 
@@ -72,7 +60,7 @@ export function getMediaType(mimeType: string): MediaType {
   }
 }
 
-export const getBasename = (file: string) => path.basename(file)
+export const getBasename = (file: string) => file.split(/[\\/]/).pop()
 
 export const getMediaDuration = (mediaUrl: string): Promise<number> => {
   return new Promise((resolve, reject) => {
@@ -94,4 +82,37 @@ export const getMediaDuration = (mediaUrl: string): Promise<number> => {
 
 export function upperCaseFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export const filterModelListByTab = (modelList: ModelCategory[], tab: string) => {
+  return modelList.reduce((acc: ModelCategory[], modelGroup) => {
+    let filteredItems = [...modelGroup.items]
+
+    switch (tab) {
+      case 'downloaded':
+        filteredItems = modelGroup.items.filter((item) => !item.disabled)
+        if (filteredItems.length > 0) {
+          acc.push({
+            ...modelGroup,
+            items: filteredItems
+          })
+        }
+        break
+      case 'multilingual':
+        if (modelGroup.id === 'multilingual') {
+          acc.push(modelGroup)
+        }
+        break
+      case 'english':
+        if (modelGroup.id === 'english') {
+          acc.push(modelGroup)
+        }
+        break
+      case 'all':
+      default:
+        acc.push(modelGroup)
+        break
+    }
+    return acc
+  }, [])
 }

@@ -11,7 +11,8 @@ import {
   ExportCompleted,
   TranscribeListSerialized,
   ExportListSerialized,
-  Caption
+  Caption,
+  VideoMetadata
 } from '../shared/models'
 
 export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
@@ -21,6 +22,7 @@ export interface IAPI extends QueueMangaerAPI, DownloadManagerAPI {
   getModelList: () => Promise<ModelCategory[]>
   deleteModel: (modelName: string) => Promise<void>
   showItemInFilesystem: (path: string) => Promise<void>
+  parseMedia: (file: string) => Promise<VideoMetadata>
 
   onModelListUpdated: (callback: (models: ModelCategory[]) => void) => () => void
   onExportCompleted: (callback: (data: ExportCompleted) => void) => () => void
